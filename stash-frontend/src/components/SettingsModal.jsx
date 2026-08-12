@@ -47,14 +47,14 @@ export default function SettingsModal({ onClose, settings, onUpdateSettings }) {
                 className={`theme-btn ${currentTheme === 'dark' ? 'active' : ''}`}
                 onClick={() => handleThemeChange('dark')}
               >
-                🌙 Dark
+                Dark
               </button>
               <button
                 type="button"
                 className={`theme-btn ${currentTheme === 'light' ? 'active' : ''}`}
                 onClick={() => handleThemeChange('light')}
               >
-                ☀️ Light
+                Light
               </button>
             </div>
           </div>

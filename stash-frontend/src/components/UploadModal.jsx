@@ -95,7 +95,7 @@ export default function UploadModal({ onClose, folderId }) {
           onDrop={handleDrop}
         >
           <div className="dropzone-icon">
-            <img src={cloudUploadIcon} alt="Upload" style={{ width: '48px', height: '48px' }} />
+            <img src={cloudUploadIcon} alt="Upload" className="cloud-upload-svg" style={{ width: '48px', height: '48px' }} />
           </div>
           <p>{getDropzoneText()}</p>
           <span className="dropzone-subtext">

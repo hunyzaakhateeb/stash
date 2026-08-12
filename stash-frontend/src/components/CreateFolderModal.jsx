@@ -54,8 +54,7 @@ export default function CreateFolderModal({ onClose, onCreated }) {
               value={folderName} 
               onChange={(e) => setFolderName(e.target.value)}
               autoFocus
-              className="search-input"
-              style={{ width: '100%', padding: '12px 16px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '10px', color: 'white' }}
+              className="modal-text-input"
             />
           </div>
 

@@ -19,7 +19,7 @@
   --text-muted: #656d76;
   --border-color: #d0d7de;
   --shadow-color: rgba(140, 149, 159, 0.15);
-  --icon-filter: brightness(0) invert(0.2);
+  --icon-filter: brightness(0);
 }
 
 * {
@@ -79,29 +79,34 @@ body {
 .search-container {
   display: flex;
   align-items: center;
-  background-color: #12151a;
-  /* Slightly darker input background */
+  background-color: var(--bg-surface-elevated);
   border: 1px solid var(--border-color);
   border-radius: 15px;
   padding: 10px 20px;
   width: 100%;
   max-width: 500px;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .search-container:focus-within {
   border-color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(25, 167, 255, 0.15);
 }
 
 .search-input {
   background: none;
   border: none;
   color: var(--text-primary);
+  caret-color: var(--text-primary);
   width: 100%;
   outline: none;
-  /* Kills browser focus ring */
   margin-left: 10px;
   font-size: 14px;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.85;
 }
 
 .actions-section {
@@ -182,9 +187,9 @@ body {
 /* --- Fix the SVG Icon Sizing so they don't blow up --- */
 .custom-tab-icon {
   width: 18px;
-  /* Forces the SVG to stay crisp and small */
   height: 18px;
   object-fit: contain;
+  filter: var(--icon-filter);
   opacity: 0.7;
   transition: all 0.25s ease;
 }
@@ -226,7 +231,7 @@ body {
 /* --- Search SVG Icon --- */
 .search-svg {
   color: var(--text-muted);
-  /* Makes the icon perfectly match your design */
+  filter: var(--icon-filter);
   margin-left: 10px;
 }
 
@@ -403,7 +408,7 @@ body {
 .action-svg-icon {
   width: 18px;
   height: 18px;
-  filter: brightness(0) invert(1);
+  filter: var(--icon-filter);
   opacity: 0.9;
   transition: opacity 0.2s ease;
 }
@@ -531,6 +536,29 @@ body {
   color: var(--text-primary);
 }
 
+.modal-text-input {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  color: var(--text-primary);
+  caret-color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.modal-text-input:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 3px rgba(25, 167, 255, 0.15);
+}
+
+.modal-text-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
 /* --- HUD-Style Dropzone --- */
 .dropzone {
   border: 2px dashed var(--border-color);
@@ -545,6 +573,11 @@ body {
 .dropzone:hover {
   border-color: var(--accent-cyan);
   background-color: rgba(25, 167, 255, 0.05);
+}
+
+.cloud-upload-svg {
+  filter: var(--icon-filter);
+  opacity: 0.9;
 }
 
 .dropzone-icon {
@@ -641,6 +674,7 @@ body {
   width: 48px;
   height: 48px;
   object-fit: contain;
+  filter: var(--icon-filter);
   opacity: 0.6;
   transition: all 0.3s ease;
 }
@@ -674,7 +708,7 @@ body {
 .settings-svg {
   width: 20px;
   height: 20px;
-  filter: brightness(0) invert(1);
+  filter: var(--icon-filter);
   opacity: 0.9;
 }
 
@@ -866,16 +900,7 @@ body {
 .folder-item-svg {
   width: 22px;
   height: 22px;
-  filter: brightness(0) invert(1);
-  opacity: 0.9;
-}
-
-.folder-card-svg,
-.breadcrumb-svg,
-.folder-item-svg {
-  width: 22px;
-  height: 22px;
-  filter: brightness(0) invert(1);
+  filter: var(--icon-filter);
   opacity: 0.9;
 }
 
