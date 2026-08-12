@@ -1,4 +1,6 @@
 import React from 'react';
+import sunIcon from '../assets/icons/sun.svg';
+import moonIcon from '../assets/icons/moon.svg';
 
 export default function SettingsModal({ onClose, settings, onUpdateSettings }) {
   const currentTheme = settings.theme || 'dark';
@@ -44,19 +46,19 @@ export default function SettingsModal({ onClose, settings, onUpdateSettings }) {
             <div className="theme-toggle-group">
               <button
                 type="button"
-                className={`theme-btn ${currentTheme === 'dark' ? 'active' : ''}`}
-                onClick={() => handleThemeChange('dark')}
-                title="Switch to Dark Theme"
-              >
-                Dark
-              </button>
-              <button
-                type="button"
                 className={`theme-btn ${currentTheme === 'light' ? 'active' : ''}`}
                 onClick={() => handleThemeChange('light')}
                 title="Switch to Light Theme"
               >
-                Light
+                <img src={sunIcon} alt="Sun Light Mode" className="theme-btn-svg" />
+              </button>
+              <button
+                type="button"
+                className={`theme-btn ${currentTheme === 'dark' ? 'active' : ''}`}
+                onClick={() => handleThemeChange('dark')}
+                title="Switch to Dark Theme"
+              >
+                <img src={moonIcon} alt="Moon Dark Mode" className="theme-btn-svg" />
               </button>
             </div>
           </div>

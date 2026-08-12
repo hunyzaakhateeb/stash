@@ -792,6 +792,18 @@ body {
   box-shadow: 0 2px 6px var(--shadow-color);
 }
 
+.theme-btn-svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  filter: var(--icon-filter);
+  transition: transform 0.2s ease;
+}
+
+.theme-btn:hover .theme-btn-svg {
+  transform: scale(1.1);
+}
+
 /* Custom Toggle Switch */
 .toggle-switch {
   width: 48px;
