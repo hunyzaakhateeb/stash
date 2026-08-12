@@ -1,0 +1,714 @@
+:root {
+  --bg-main: #0d1117;        
+  --bg-surface: #161b22;     
+  --accent-cyan: #19a7ff;    /* <-- Your exact Figma hex code! */
+  --text-primary: #ffffff;
+  --text-muted: #8b949e;
+  --border-color: #30363d;
+
+}
+
+/* Update your body tag to use the new variable */
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #0d1117; /* The dark background from your Figma */
+  color: white;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+/* =========================================
+   NAVBAR COMPONENT STYLES
+   ========================================= */
+.navbar {
+  background-color: var(--bg-main);
+  width: 100%;
+  border-bottom: 1px solid var(--border-color); 
+}
+
+/* --- Top Row --- */
+.navbar-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  max-width: 1400px; /* Aligns with your grid */
+  margin: 0 auto;    /* Centers the content */
+}
+
+/* Flex 1, 2, 1 forces the middle item to be dead center */
+.logo-section {
+  flex: 1 1 0; 
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-text {
+  color: var(--accent-cyan);
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.search-section {
+  flex: 2; 
+  display: flex;
+  justify-content: center;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  background-color: #12151a; /* Slightly darker input background */
+  border: 1px solid var(--border-color);
+  border-radius: 15px;
+  padding: 10px 20px;
+  width: 100%;
+  max-width: 500px;
+  transition: border-color 0.3s ease;
+}
+
+.search-container:focus-within {
+  border-color: var(--accent-cyan);
+}
+
+.search-input {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  width: 100%;
+  outline: none; /* Kills browser focus ring */
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+.actions-section {
+  flex: 1 1 0; 
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* --- Add Button --- */
+.add-button {
+  background: transparent;
+  border: 1px solid var(--text-primary);
+  color: var(--text-primary);
+  padding: 8px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.add-button .add-svg-icon {
+  width: 16px;
+  height: 16px;
+  filter: invert(1);
+  transition: filter 0.2s ease;
+}
+
+.add-button:hover {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.add-button:hover .add-svg-icon {
+  filter: invert(80%) sepia(50%) saturate(1000%) hue-rotate(140deg);
+}
+
+/* --- Tabs --- */
+/* --- Navbar Tabs with Lit-Up Box & Underline --- */
+.navbar-tabs {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  gap: 12px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Space between your SVG icon and text */
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 16px;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+/* --- Fix the SVG Icon Sizing so they don't blow up --- */
+.custom-tab-icon {
+  width: 18px;  /* Forces the SVG to stay crisp and small */
+  height: 18px;
+  object-fit: contain;
+  opacity: 0.7;
+  transition: all 0.25s ease;
+}
+
+/* Hover & Active States */
+.tab:hover {
+  color: var(--accent-cyan);
+  background-color: rgba(25, 167, 255, 0.08);
+  transform: scale(1.05);
+  box-shadow: 0 -4px 15px rgba(25, 167, 255, 0.12);
+}
+
+.tab:hover .custom-tab-icon {
+  opacity: 1;
+  transform: scale(1.12);
+  filter: drop-shadow(0 0 6px var(--accent-cyan));
+}
+
+.tab.active {
+  color: var(--text-primary);
+  background-color: rgba(25, 167, 255, 0.12);
+  transform: scale(1.03);
+  box-shadow: 0 -4px 20px rgba(25, 167, 255, 0.2);
+}
+
+.tab.active .custom-tab-icon {
+  opacity: 1;
+  filter: drop-shadow(0 0 8px var(--accent-cyan));
+}
+
+/* --- Custom Logo --- */
+.custom-logo {
+  height: 32px; /* Adjust this number to make your logo bigger or smaller */
+  width: auto;
+  display: block;
+}
+
+/* --- Search SVG Icon --- */
+.search-svg {
+  color: var(--text-muted); /* Makes the icon perfectly match your design */
+  margin-left: 10px;
+}
+
+/* =========================================
+   DASHBOARD & FILE GRID
+   ========================================= */
+.dashboard-content {
+  padding: 40px;
+  max-width: 1400px;
+  margin: 0 auto; /* Keeps the grid centered on massive screens */
+}
+
+.file-grid {
+  display: grid;
+  /* This magically makes the grid responsive without media queries! */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+/* =========================================
+   FILE CARD V2 (Clean & Powerful)
+   ========================================= */
+.file-card-v2 {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color); /* Subtle default border */
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  cursor: pointer;
+  /* Smooth transition for the border color, scaling, and glow bloom */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+
+/* 👇 The Hover State: Border lights up cyan and outer shadow blooms intensely */
+.file-card-v2:hover {
+  transform: translateY(-4px) scale(1.02); /* Slight lift and zoom */
+  border-color: var(--accent-cyan);
+  background-color: rgba(22, 27, 34, 0.95); /* Deepens surface contrast */
+  box-shadow: 0 0 25px rgba(25, 167, 255, 0.35), inset 0 0 10px rgba(25, 167, 255, 0.15); /* Intense neon border glow */
+}
+
+/* --- The Preview Box Adjustment --- */
+.file-preview {
+  position: relative;
+  overflow: hidden;
+  height: 160px;
+  width: 100%;
+  border-radius: 8px; /* Clean inner radius */
+  background-color: rgba(13, 17, 23, 0.5);
+}
+
+.media-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: scale(1);
+  transition: filter 0.4s ease, transform 0.4s ease;
+  z-index: 1;
+}
+
+.media-background .preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.7; /* Dims the background slightly */
+}
+
+.media-background .fallback-icon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  opacity: 0.5;
+}
+
+.dynamic-placeholder-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem; /* Big central emoji */
+  z-index: 2;
+  opacity: 1;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.file-card-v2:hover .preview-image {
+  transform: scale(1.05);
+}
+
+.file-card-v2:hover .file-preview {
+  border-color: var(--accent-cyan);
+}
+
+/* --- The Action Overlay --- */
+.hover-actions {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4); /* Darkens the image slightly so buttons are readable */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  opacity: 0;
+  z-index: 3;
+  transition: opacity 0.3s ease;
+}
+
+.file-card-v2:hover .media-background {
+  transform: scale(1.05);
+}
+
+.file-card-v2:hover .dynamic-placeholder-overlay {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.file-card-v2:hover .hover-actions {
+  opacity: 1;
+}
+
+.action-btn {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background-color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+/* --- The Info Area --- */
+.file-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.file-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+  /* Truncates long names with ... */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+  opacity: 0; /* Hidden by default! */
+  transform: translateY(-5px); /* Slides down slightly on hover */
+  transition: all 0.2s ease;
+}
+
+.file-card-v2:hover .file-meta {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =========================================
+   LOAD MORE BUTTON
+   ========================================= */
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+  padding-bottom: 40px;
+}
+
+.load-more-btn {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 10px 32px;
+  border-radius: 24px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.load-more-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-cyan);
+  /* A super subtle blue glow using your specific hex code! */
+  background-color: rgba(25, 167, 255, 0.05); 
+}
+
+/* =========================================
+   UPLOAD MODAL (GLASSMORPHISM)
+   ========================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(13, 17, 23, 0.7); /* Dark semi-transparent overlay */
+  backdrop-filter: blur(8px); /* The magic glassmorphism blur */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  padding: 24px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease-out;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.modal-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: var(--text-primary);
+}
+
+/* --- HUD-Style Dropzone --- */
+.dropzone {
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  padding: 60px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: rgba(25, 167, 255, 0.02);
+}
+
+.dropzone:hover {
+  border-color: var(--accent-cyan);
+  background-color: rgba(25, 167, 255, 0.05);
+}
+
+.dropzone-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+}
+
+.dropzone p {
+  font-size: 16px;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.dropzone-subtext {
+  font-size: 14px;
+  color: var(--accent-cyan);
+}
+
+.hidden-input {
+  display: none;
+}
+
+/* --- Footer Buttons --- */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.cancel-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.upload-btn {
+  background-color: var(--accent-cyan);
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.upload-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(25, 167, 255, 0.3);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.action-btn.delete-btn:hover {
+  background-color: rgba(255, 50, 50, 0.2);
+  color: #ff4444;
+  border-color: #ff4444;
+  box-shadow: 0 0 10px rgba(255, 50, 50, 0.5), inset 0 0 5px rgba(255, 50, 50, 0.3);
+  text-shadow: 0 0 5px rgba(255, 50, 50, 0.8);
+}
+
+/* Card Custom SVG Icons */
+.card-center-svg,
+.card-custom-svg {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.file-card-v2:hover .card-center-svg {
+  opacity: 0.9;
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 8px var(--accent-cyan));
+}
+
+/* --- Settings Button & Modal Styles --- */
+.settings-icon-btn {
+  background: var(--bg-surface-elevated, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.settings-icon-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent-cyan);
+  transform: rotate(30deg);
+}
+
+.settings-svg {
+  width: 20px;
+  height: 20px;
+  opacity: 0.85;
+}
+
+.settings-modal-content {
+  max-width: 500px;
+  width: 90%;
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  transition: border-color 0.2s ease;
+}
+
+.setting-row:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.setting-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.setting-title {
+  font-weight: 600;
+  color: var(--text-primary, #fff);
+  font-size: 0.95rem;
+}
+
+.setting-description {
+  font-size: 0.82rem;
+  color: var(--text-muted, #94a3b8);
+  margin: 0;
+  line-height: 1.35;
+}
+
+/* Custom Toggle Switch */
+.toggle-switch {
+  width: 48px;
+  height: 26px;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  border: none;
+  padding: 3px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.toggle-switch.active {
+  background-color: var(--accent-cyan, #19a7ff);
+}
+
+.toggle-thumb {
+  width: 20px;
+  height: 20px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-switch.active .toggle-thumb {
+  transform: translateX(22px);
+}
+
+/* --- Media Preview Video & Blur Styles --- */
+.preview-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.blurred-media {
+  filter: blur(14px);
+  scale: 1.05;
+  transition: filter 0.35s ease, transform 0.35s ease;
+}
+
+.file-card-v2:hover .blurred-media {
+  filter: blur(0px);
+  scale: 1;
+}
+
+
