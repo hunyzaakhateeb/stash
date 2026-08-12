@@ -1064,6 +1064,17 @@ body {
   box-shadow: 0 0 12px rgba(25, 167, 255, 0.3);
 }
 
+.theme-toggle-svg {
+  width: 20px;
+  height: 20px;
+  filter: var(--icon-filter);
+  transition: transform 0.25s ease;
+}
+
+.auth-theme-toggle-btn:hover .theme-toggle-svg {
+  transform: rotate(20deg) scale(1.1);
+}
+
 .auth-header {
   text-align: center;
   margin-bottom: 24px;

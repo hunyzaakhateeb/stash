@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import logo from '../assets/logo.svg';
+import sunIcon from '../assets/icons/sun.svg';
+import moonIcon from '../assets/icons/moon.svg';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
@@ -168,7 +170,7 @@ export default function AuthPage({ onAuthSuccess }) {
           onClick={toggleTheme}
           title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
         >
-          {theme === 'dark' ? '☀️' : '🌙'}
+          <img src={theme === 'dark' ? sunIcon : moonIcon} alt="Theme" className="theme-toggle-svg" />
         </button>
 
         {/* Header / Logo */}

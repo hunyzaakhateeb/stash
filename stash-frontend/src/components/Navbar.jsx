@@ -13,6 +13,7 @@ import logo from '../assets/logo.svg';
 import searchIcon from '../assets/search-icon.svg';
 import settingsIcon from '../assets/icons/settings.svg';
 import plusIcon from '../assets/icons/plus.svg';
+import logoutIcon from '../assets/icons/logout.svg';
 
 export default function Navbar({ onAddClick, onCreateFolderClick, onOpenSettings, activeTab, setActiveTab, searchQuery, setSearchQuery, user, onLogout }) {
 
@@ -64,7 +65,7 @@ export default function Navbar({ onAddClick, onCreateFolderClick, onOpenSettings
           </button>
           {onLogout && (
             <button className="settings-icon-btn" onClick={onLogout} title={user ? `Sign Out (${user.username || user.email})` : "Sign Out"}>
-              <span style={{ fontSize: '1rem' }}>🚪</span>
+              <img src={logoutIcon} alt="Sign Out" className="settings-svg" />
             </button>
           )}
         </div>
