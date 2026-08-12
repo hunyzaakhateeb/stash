@@ -230,6 +230,7 @@ function App() {
     <div className="stash-app">
       <Navbar
         onAddClick={() => setIsModalOpen(true)}
+        onCreateFolderClick={() => setIsCreateFolderOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
         activeTab={activeTab}
         setActiveTab={handleTabChange}

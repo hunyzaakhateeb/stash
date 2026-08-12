@@ -14,7 +14,7 @@ import searchIcon from '../assets/search-icon.svg';
 import settingsIcon from '../assets/icons/settings.svg';
 import plusIcon from '../assets/icons/plus.svg';
 
-export default function Navbar({ onAddClick, onOpenSettings, activeTab, setActiveTab, searchQuery, setSearchQuery }) {
+export default function Navbar({ onAddClick, onCreateFolderClick, onOpenSettings, activeTab, setActiveTab, searchQuery, setSearchQuery }) {
   
   const tabIcons = {
     'All': allIcon,
@@ -53,6 +53,10 @@ export default function Navbar({ onAddClick, onOpenSettings, activeTab, setActiv
         <div className="actions-section" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <button className="settings-icon-btn" onClick={onOpenSettings} title="Preferences & Settings">
             <img src={settingsIcon} alt="Settings" className="settings-svg" />
+          </button>
+          <button className="create-folder-btn" onClick={onCreateFolderClick} title="Create New Folder">
+            <img src={plusIcon} alt="Plus" className="add-svg-icon" />
+            Folder
           </button>
           <button className="add-button" onClick={onAddClick}>
             <img src={plusIcon} alt="Add" className="add-svg-icon" />
