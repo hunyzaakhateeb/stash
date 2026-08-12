@@ -5,6 +5,7 @@ const multer = require('multer');
 const mongoose = require('mongoose');
 const { Readable } = require('stream');
 const File = require('./models/File');
+const Folder = require('./models/Folder');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -71,6 +72,7 @@ app.post('/upload', upload.any(), async (req, res) => {
     if (filesToUpload.length === 0) return res.status(400).json({ error: 'No file provided.' });
     if (!gridfsBucket) return res.status(500).json({ error: 'GridFS storage bucket not ready.' });
 
+    const targetFolderId = req.body.folderId || null;
     const host = req.get('host');
     const protocol = req.protocol;
     const uploadedDocs = [];
@@ -104,6 +106,7 @@ app.post('/upload', upload.any(), async (req, res) => {
               mimeType: mimeType,
               isFavorite: false,
               isTrashed: false,
+              folderId: targetFolderId ? new mongoose.Types.ObjectId(targetFolderId) : null
             });
 
             await newFile.save();
@@ -158,7 +161,7 @@ app.get('/files', async (req, res) => {
   }
 });
 
-// 3. STREAM FILE CONTENT INLINE (for images, videos, pdfs, audio)
+// 3. STREAM FILE CONTENT INLINE
 app.get('/files/raw/:id', async (req, res) => {
   try {
     if (!gridfsBucket) return res.status(500).json({ error: 'GridFS bucket not ready' });
@@ -185,7 +188,7 @@ app.get('/files/raw/:id', async (req, res) => {
   }
 });
 
-// 4. DOWNLOAD FILE (WITH ATTACHMENT HEADER)
+// 4. DOWNLOAD FILE (ATTACHMENT HEADER)
 app.get('/files/download/:id', async (req, res) => {
   try {
     if (!gridfsBucket) return res.status(500).json({ error: 'GridFS bucket not ready' });
@@ -245,7 +248,24 @@ app.patch('/files/:id/trash', async (req, res) => {
   }
 });
 
-// 7. PERMANENTLY DELETE FILE (FROM GRIDFS & METADATA)
+// 7. SHIFT / MOVE FILE TO A FOLDER (OR ROOT)
+app.patch('/files/:id/move', async (req, res) => {
+  try {
+    const { folderId } = req.body;
+    const fileDoc = await File.findById(req.params.id);
+    if (!fileDoc) return res.status(404).json({ error: 'File not found' });
+
+    fileDoc.folderId = folderId ? new mongoose.Types.ObjectId(folderId) : null;
+    await fileDoc.save();
+
+    res.json({ message: 'File moved successfully', file: fileDoc });
+  } catch (error) {
+    console.error('Error moving file:', error);
+    res.status(500).json({ error: 'Failed to move file' });
+  }
+});
+
+// 8. PERMANENTLY DELETE FILE
 app.delete('/files/:id', async (req, res) => {
   try {
     const fileDoc = await File.findById(req.params.id);
@@ -254,7 +274,6 @@ app.delete('/files/:id', async (req, res) => {
       return res.status(404).json({ error: 'File not found in database' });
     }
 
-    // Delete chunk data from GridFS bucket
     if (gridfsBucket && fileDoc.gridFsFileId) {
       try {
         await gridfsBucket.delete(new mongoose.Types.ObjectId(fileDoc.gridFsFileId));
@@ -263,13 +282,76 @@ app.delete('/files/:id', async (req, res) => {
       }
     }
 
-    // Delete metadata document from MongoDB
     await File.findByIdAndDelete(req.params.id);
 
     res.json({ message: 'File shredded successfully from MongoDB GridFS vault' });
   } catch (error) {
     console.error('Delete error:', error);
     res.status(500).json({ error: 'Failed to delete file' });
+  }
+});
+
+// --- FOLDER ROUTES ---
+
+// 9. CREATE A NEW FOLDER
+app.post('/folders', async (req, res) => {
+  try {
+    const { name, color } = req.body;
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'Folder name is required.' });
+    }
+
+    const folder = new Folder({
+      name: name.trim(),
+      color: color || '#00f2fe'
+    });
+
+    await folder.save();
+    res.status(201).json({ message: 'Folder created successfully', folder });
+  } catch (error) {
+    console.error('Error creating folder:', error);
+    res.status(500).json({ error: 'Failed to create folder' });
+  }
+});
+
+// 10. GET ALL FOLDERS WITH FILE STATS
+app.get('/folders', async (req, res) => {
+  try {
+    const folders = await Folder.find().sort({ createdAt: -1 });
+    const allFiles = await File.find({ isTrashed: false });
+
+    const foldersWithStats = folders.map(folder => {
+      const folderFiles = allFiles.filter(file => file.folderId && file.folderId.toString() === folder._id.toString());
+      return {
+        ...folder.toObject(),
+        fileCount: folderFiles.length,
+      };
+    });
+
+    res.json(foldersWithStats);
+  } catch (error) {
+    console.error('Error fetching folders:', error);
+    res.status(500).json({ error: 'Failed to fetch folders' });
+  }
+});
+
+// 11. DELETE A FOLDER (UNASSIGN FILES TO ROOT)
+app.delete('/folders/:id', async (req, res) => {
+  try {
+    const folderId = req.params.id;
+    const folder = await Folder.findByIdAndDelete(folderId);
+
+    if (!folder) {
+      return res.status(404).json({ error: 'Folder not found' });
+    }
+
+    // Unassign files inside this folder back to root vault
+    await File.updateMany({ folderId: new mongoose.Types.ObjectId(folderId) }, { folderId: null });
+
+    res.json({ message: 'Folder deleted and contained files unassigned to root vault' });
+  } catch (error) {
+    console.error('Error deleting folder:', error);
+    res.status(500).json({ error: 'Failed to delete folder' });
   }
 });
 

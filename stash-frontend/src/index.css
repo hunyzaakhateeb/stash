@@ -711,4 +711,220 @@ body {
   scale: 1;
 }
 
+/* --- Folder Management & Move Modal Styles --- */
+.folders-container {
+  width: 100%;
+  margin-bottom: 24px;
+}
 
+.folders-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.create-folder-btn {
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+  color: #0d1117;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.create-folder-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+}
+
+.create-folder-btn .add-svg-icon {
+  filter: invert(0) !important;
+}
+
+.folder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.folder-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(10px);
+}
+
+.folder-card:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(0, 242, 254, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.folder-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.folder-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.folder-card-svg {
+  width: 24px;
+  height: 24px;
+  filter: invert(70%) sepia(80%) saturate(1000%) hue-rotate(150deg);
+}
+
+.folder-delete-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.folder-card:hover .folder-delete-btn {
+  opacity: 1;
+}
+
+.folder-delete-btn:hover {
+  background: rgba(255, 68, 68, 0.2);
+}
+
+.folder-name {
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.folder-meta {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.back-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--accent-cyan);
+}
+
+.breadcrumb-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.breadcrumb-svg {
+  width: 22px;
+  height: 22px;
+  filter: invert(75%) sepia(80%) saturate(1000%) hue-rotate(150deg);
+}
+
+/* --- Move File Modal Selection List --- */
+.folder-selection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.folder-select-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.folder-select-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.folder-select-item.selected {
+  background: rgba(0, 242, 254, 0.12);
+  border-color: #00f2fe;
+}
+
+.folder-item-svg {
+  width: 20px;
+  height: 20px;
+  filter: invert(75%) sepia(80%) saturate(1000%) hue-rotate(150deg);
+}
+
+.folder-item-icon {
+  font-size: 1.2rem;
+}
+
+.folder-item-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.folder-item-info strong {
+  color: white;
+  font-size: 0.9rem;
+}
+
+.folder-item-info span {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.check-mark {
+  color: #00f2fe;
+  font-size: 1rem;
+  font-weight: bold;
+}

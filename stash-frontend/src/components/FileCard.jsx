@@ -13,6 +13,7 @@ import trashIcon from '../assets/icons/trash.svg';
 import emptyHeartIcon from '../assets/icons/empty_heart.svg';
 import fillHeartIcon from '../assets/icons/fill_heart.svg';
 import restoreIcon from '../assets/icons/restore.svg';
+import moveIcon from '../assets/icons/move.svg';
 
 export default function FileCard({ 
   type = 'image', 
@@ -26,6 +27,7 @@ export default function FileCard({
   isTrashed, 
   onToggleFavorite,
   onRestore,
+  onMove,
   settings = {}
 }) {
 
@@ -146,6 +148,13 @@ export default function FileCard({
               <button className="action-btn" title="Download" onClick={handleDownload}>
                 <img src={downloadIcon} alt="Download" className="action-svg-icon" />
               </button>
+
+              {/* Move / Shift Button */}
+              {onMove && (
+                <button className="action-btn" title="Shift / Move to Folder" onClick={(e) => { e.stopPropagation(); onMove(); }}>
+                  <img src={moveIcon} alt="Move" className="action-svg-icon" />
+                </button>
+              )}
             </>
           )}
           

@@ -9,6 +9,7 @@ const fileSchema = new mongoose.Schema({
   mimeType: { type: String, required: true },       // MIME type e.g. 'image/png', 'application/pdf'
   isFavorite: { type: Boolean, default: false },    // Favorite status flag
   isTrashed: { type: Boolean, default: false },     // Trash status flag
+  folderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Folder', default: null }, // Optional folder reference
   createdAt: { type: Date, default: Date.now }      // Upload timestamp
 });
 

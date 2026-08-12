@@ -3,7 +3,7 @@ import cloudUploadIcon from '../assets/icons/cloud_upload.svg';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
-export default function UploadModal({ onClose }) {
+export default function UploadModal({ onClose, folderId }) {
   const fileInputRef = useRef(null);
   
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -41,6 +41,9 @@ export default function UploadModal({ onClose }) {
     setIsUploading(true);
 
     const formData = new FormData();
+    if (folderId) {
+      formData.append('folderId', folderId);
+    }
     selectedFiles.forEach((file) => {
       formData.append('files', file);
     });

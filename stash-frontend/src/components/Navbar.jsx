@@ -8,6 +8,7 @@ import docsIcon from '../assets/icons/doc.svg';
 import audioIcon from '../assets/icons/audio.svg';
 import favIcon from '../assets/icons/fill_heart.svg';
 import trashIcon from '../assets/icons/trash.svg';
+import folderIcon from '../assets/icons/folder.svg';
 import logo from '../assets/logo.svg';
 import searchIcon from '../assets/search-icon.svg'; 
 import settingsIcon from '../assets/icons/settings.svg';
@@ -17,6 +18,7 @@ export default function Navbar({ onAddClick, onOpenSettings, activeTab, setActiv
   
   const tabIcons = {
     'All': allIcon,
+    'Folders': folderIcon,
     'Photos': photosIcon,
     'Videos': videosIcon,
     'Documents': docsIcon,
@@ -25,7 +27,7 @@ export default function Navbar({ onAddClick, onOpenSettings, activeTab, setActiv
     'Trash': trashIcon,
   };
 
-  const tabs = ['All', 'Photos', 'Videos', 'Documents', 'Audio', 'Favorites', 'Trash'];
+  const tabs = ['All', 'Folders', 'Photos', 'Videos', 'Documents', 'Audio', 'Favorites', 'Trash'];
 
   return (
     <nav className="navbar">
