@@ -1,7 +1,8 @@
 :root {
-  --bg-main: #0d1117;        
-  --bg-surface: #161b22;     
-  --accent-cyan: #19a7ff;    /* <-- Your exact Figma hex code! */
+  --bg-main: #0d1117;
+  --bg-surface: #161b22;
+  --accent-cyan: #19a7ff;
+  /* <-- Your exact Figma hex code! */
   --text-primary: #ffffff;
   --text-muted: #8b949e;
   --border-color: #30363d;
@@ -14,6 +15,7 @@ body {
   color: var(--text-primary);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -21,17 +23,19 @@ body {
 }
 
 body {
-  background-color: #0d1117; /* The dark background from your Figma */
+  background-color: #0d1117;
+  /* The dark background from your Figma */
   color: white;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
+
 /* =========================================
    NAVBAR COMPONENT STYLES
    ========================================= */
 .navbar {
   background-color: var(--bg-main);
   width: 100%;
-  border-bottom: 1px solid var(--border-color); 
+  border-bottom: 1px solid var(--border-color);
 }
 
 /* --- Top Row --- */
@@ -40,13 +44,15 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 20px 40px;
-  max-width: 1400px; /* Aligns with your grid */
-  margin: 0 auto;    /* Centers the content */
+  max-width: 1400px;
+  /* Aligns with your grid */
+  margin: 0 auto;
+  /* Centers the content */
 }
 
 /* Flex 1, 2, 1 forces the middle item to be dead center */
 .logo-section {
-  flex: 1 1 0; 
+  flex: 1 1 0;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -59,7 +65,7 @@ body {
 }
 
 .search-section {
-  flex: 2; 
+  flex: 2;
   display: flex;
   justify-content: center;
 }
@@ -67,7 +73,8 @@ body {
 .search-container {
   display: flex;
   align-items: center;
-  background-color: #12151a; /* Slightly darker input background */
+  background-color: #12151a;
+  /* Slightly darker input background */
   border: 1px solid var(--border-color);
   border-radius: 15px;
   padding: 10px 20px;
@@ -85,13 +92,14 @@ body {
   border: none;
   color: var(--text-primary);
   width: 100%;
-  outline: none; /* Kills browser focus ring */
+  outline: none;
+  /* Kills browser focus ring */
   margin-left: 10px;
   font-size: 14px;
 }
 
 .actions-section {
-  flex: 1 1 0; 
+  flex: 1 1 0;
   display: flex;
   justify-content: flex-end;
 }
@@ -124,7 +132,7 @@ body {
 }
 
 .add-button:hover,
-.create-folder-btn:hover {
+.create-move-btn:hover {
   background-color: rgba(255, 255, 255, 0.1);
   border-color: var(--accent-cyan);
   color: var(--text-primary);
@@ -150,7 +158,8 @@ body {
 .tab {
   display: flex;
   align-items: center;
-  gap: 8px; /* Space between your SVG icon and text */
+  gap: 8px;
+  /* Space between your SVG icon and text */
   background: transparent;
   border: none;
   color: var(--text-muted);
@@ -166,7 +175,8 @@ body {
 
 /* --- Fix the SVG Icon Sizing so they don't blow up --- */
 .custom-tab-icon {
-  width: 18px;  /* Forces the SVG to stay crisp and small */
+  width: 18px;
+  /* Forces the SVG to stay crisp and small */
   height: 18px;
   object-fit: contain;
   opacity: 0.7;
@@ -201,14 +211,16 @@ body {
 
 /* --- Custom Logo --- */
 .custom-logo {
-  height: 32px; /* Adjust this number to make your logo bigger or smaller */
+  height: 32px;
+  /* Adjust this number to make your logo bigger or smaller */
   width: auto;
   display: block;
 }
 
 /* --- Search SVG Icon --- */
 .search-svg {
-  color: var(--text-muted); /* Makes the icon perfectly match your design */
+  color: var(--text-muted);
+  /* Makes the icon perfectly match your design */
   margin-left: 10px;
 }
 
@@ -218,7 +230,8 @@ body {
 .dashboard-content {
   padding: 40px;
   max-width: 1400px;
-  margin: 0 auto; /* Keeps the grid centered on massive screens */
+  margin: 0 auto;
+  /* Keeps the grid centered on massive screens */
 }
 
 .file-grid {
@@ -233,7 +246,8 @@ body {
    ========================================= */
 .file-card-v2 {
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-color); /* Subtle default border */
+  border: 1px solid var(--border-color);
+  /* Subtle default border */
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -241,15 +255,18 @@ body {
   padding: 12px;
   cursor: pointer;
   /* Smooth transition for the border color, scaling, and glow bloom */
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* 👇 The Hover State: Border lights up cyan and outer shadow blooms intensely */
 .file-card-v2:hover {
-  transform: translateY(-4px) scale(1.02); /* Slight lift and zoom */
+  transform: translateY(-4px) scale(1.02);
+  /* Slight lift and zoom */
   border-color: var(--accent-cyan);
-  background-color: rgba(22, 27, 34, 0.95); /* Deepens surface contrast */
-  box-shadow: 0 0 25px rgba(25, 167, 255, 0.35), inset 0 0 10px rgba(25, 167, 255, 0.15); /* Intense neon border glow */
+  background-color: rgba(22, 27, 34, 0.95);
+  /* Deepens surface contrast */
+  box-shadow: 0 0 25px rgba(25, 167, 255, 0.35), inset 0 0 10px rgba(25, 167, 255, 0.15);
+  /* Intense neon border glow */
 }
 
 /* --- The Preview Box Adjustment --- */
@@ -258,7 +275,8 @@ body {
   overflow: hidden;
   height: 160px;
   width: 100%;
-  border-radius: 8px; /* Clean inner radius */
+  border-radius: 8px;
+  /* Clean inner radius */
   background-color: rgba(13, 17, 23, 0.5);
 }
 
@@ -277,7 +295,8 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.7; /* Dims the background slightly */
+  opacity: 0.7;
+  /* Dims the background slightly */
 }
 
 .media-background .fallback-icon {
@@ -299,7 +318,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 4rem; /* Big central emoji */
+  font-size: 4rem;
+  /* Big central emoji */
   z-index: 2;
   opacity: 1;
   transition: opacity 0.3s ease, transform 0.3s ease;
@@ -328,7 +348,8 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4); /* Darkens the image slightly so buttons are readable */
+  background: rgba(0, 0, 0, 0.4);
+  /* Darkens the image slightly so buttons are readable */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -373,6 +394,19 @@ body {
   transform: scale(1.1);
 }
 
+.action-svg-icon {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+  transition: opacity 0.2s ease;
+}
+
+.action-btn:hover .action-svg-icon {
+  filter: brightness(0) invert(1);
+  opacity: 1;
+}
+
 /* --- The Info Area --- */
 .file-info {
   display: flex;
@@ -395,8 +429,10 @@ body {
   font-size: 12px;
   color: var(--text-muted);
   margin: 0;
-  opacity: 0; /* Hidden by default! */
-  transform: translateY(-5px); /* Slides down slightly on hover */
+  opacity: 0;
+  /* Hidden by default! */
+  transform: translateY(-5px);
+  /* Slides down slightly on hover */
   transition: all 0.2s ease;
 }
 
@@ -430,7 +466,7 @@ body {
   color: var(--text-primary);
   border-color: var(--accent-cyan);
   /* A super subtle blue glow using your specific hex code! */
-  background-color: rgba(25, 167, 255, 0.05); 
+  background-color: rgba(25, 167, 255, 0.05);
 }
 
 /* =========================================
@@ -442,8 +478,10 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(13, 17, 23, 0.7); /* Dark semi-transparent overlay */
-  backdrop-filter: blur(8px); /* The magic glassmorphism blur */
+  background-color: rgba(13, 17, 23, 0.7);
+  /* Dark semi-transparent overlay */
+  backdrop-filter: blur(8px);
+  /* The magic glassmorphism blur */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -562,13 +600,25 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .action-btn.delete-btn:hover {
@@ -770,6 +820,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.folder-card-svg,
+.breadcrumb-svg,
+.folder-item-svg {
+  width: 22px;
+  height: 22px;
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
 }
 
 .folder-card-svg,
