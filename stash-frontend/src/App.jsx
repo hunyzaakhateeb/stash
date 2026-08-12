@@ -9,6 +9,7 @@ import MoveFileModal from './components/MoveFileModal';
 import plusIcon from './assets/icons/plus.svg';
 import folderIcon from './assets/icons/folder.svg';
 import backIcon from './assets/icons/back.svg';
+import { getCleanFileName } from './utils/cleanName';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
@@ -189,7 +190,7 @@ function App() {
   // Filter files based on current tab, search query, or active folder
   const displayFiles = files.filter(file => {
     const filename = file.displayName || file.name || '';
-    const cleanName = filename.replace(/^\d+-/, '').toLowerCase();
+    const cleanName = getCleanFileName(filename).toLowerCase();
     if (searchQuery && !cleanName.includes(searchQuery.toLowerCase())) {
       return false; 
     }

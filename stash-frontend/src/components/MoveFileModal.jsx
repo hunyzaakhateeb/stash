@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import folderIcon from '../assets/icons/folder.svg';
+import { getCleanFileName } from '../utils/cleanName';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 export default function MoveFileModal({ file, folders, onClose, onMoved }) {
   const [selectedFolderId, setSelectedFolderId] = useState(file.folderId || null);
   const [isMoving, setIsMoving] = useState(false);
+
+  const cleanName = getCleanFileName(file.displayName || file.name);
 
   const handleMove = async () => {
     setIsMoving(true);
@@ -35,12 +38,12 @@ export default function MoveFileModal({ file, folders, onClose, onMoved }) {
       <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '440px' }}>
         <div className="modal-header">
           <h3>Shift / Move File</h3>
-          <button className="close-btn" onClick={onClose}>✕</button>
+          <button className="close-btn" onClick={onClose} title="Close">✕</button>
         </div>
 
         <div style={{ margin: '15px 0' }}>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '15px' }}>
-            Select destination for <strong style={{ color: 'white' }}>{file.name}</strong>:
+            Select destination for <strong style={{ color: 'var(--text-primary)' }}>{cleanName}</strong>:
           </p>
 
           <div className="folder-selection-list">

@@ -76,7 +76,7 @@ export default function Navbar({ onAddClick, onCreateFolderClick, onOpenSettings
               onClick={() => setActiveTab(tab)}
               title={tagTitle}
             >
-              <img src={tabIcons[tab]} alt={`${tab} icon`} className="custom-tab-icon" />
+              <img src={tabIcons[tab]} alt={`${tab} icon`} className={`custom-tab-icon ${tab === 'Folders' ? 'folder-tab-icon' : ''}`} />
               <span>{tab}</span>
             </button>
           );

@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { getCleanFileName } from '../utils/cleanName';
 
 // Import your custom SVGs for the file cards
 import photosIcon from '../assets/icons/pic.svg';
@@ -31,7 +32,7 @@ export default function FileCard({
   settings = {}
 }) {
 
-  const displayName = name.replace(/^\d+-/, '');
+  const displayName = getCleanFileName(name);
   const videoRef = useRef(null);
 
   const handleMouseEnter = () => {

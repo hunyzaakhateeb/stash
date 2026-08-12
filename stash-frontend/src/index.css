@@ -220,6 +220,16 @@ body {
   filter: drop-shadow(0 0 8px var(--accent-cyan));
 }
 
+.tab.active .folder-tab-icon {
+  opacity: 1;
+  filter: brightness(0) invert(1) drop-shadow(0 0 8px var(--accent-cyan)) !important;
+}
+
+[data-theme="light"] .tab.active .folder-tab-icon {
+  opacity: 1;
+  filter: brightness(0) drop-shadow(0 0 6px var(--accent-cyan)) !important;
+}
+
 /* --- Custom Logo --- */
 .custom-logo {
   height: 32px;
@@ -894,7 +904,7 @@ body {
   width: 42px;
   height: 42px;
   border-radius: 10px;
-  background: rgba(13, 17, 23, 0.85);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
@@ -902,13 +912,7 @@ body {
 }
 
 .folder-card-svg,
-.breadcrumb-svg {
-  width: 22px;
-  height: 22px;
-  filter: brightness(0) invert(1) !important;
-  opacity: 1;
-}
-
+.breadcrumb-svg,
 .folder-item-svg {
   width: 22px;
   height: 22px;
