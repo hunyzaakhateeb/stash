@@ -1,6 +1,15 @@
 import React from 'react';
 
 export default function SettingsModal({ onClose, settings, onUpdateSettings }) {
+  const currentTheme = settings.theme || 'dark';
+
+  const handleThemeChange = (newTheme) => {
+    onUpdateSettings({
+      ...settings,
+      theme: newTheme
+    });
+  };
+
   const handleToggleBlur = () => {
     onUpdateSettings({
       ...settings,
@@ -24,6 +33,32 @@ export default function SettingsModal({ onClose, settings, onUpdateSettings }) {
         </div>
 
         <div className="settings-section">
+          {/* App Theme Selector */}
+          <div className="setting-row">
+            <div className="setting-info">
+              <label className="setting-title">App Theme</label>
+              <p className="setting-description">
+                Switch between dark mode and light mode appearance.
+              </p>
+            </div>
+            <div className="theme-toggle-group">
+              <button
+                type="button"
+                className={`theme-btn ${currentTheme === 'dark' ? 'active' : ''}`}
+                onClick={() => handleThemeChange('dark')}
+              >
+                🌙 Dark
+              </button>
+              <button
+                type="button"
+                className={`theme-btn ${currentTheme === 'light' ? 'active' : ''}`}
+                onClick={() => handleThemeChange('light')}
+              >
+                ☀️ Light
+              </button>
+            </div>
+          </div>
+
           <div className="setting-row">
             <div className="setting-info">
               <label className="setting-title">Blur File Previews</label>

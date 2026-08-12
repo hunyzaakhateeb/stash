@@ -31,7 +31,13 @@ function App() {
   const [trashedFiles, setTrashedFiles] = useState(() => JSON.parse(localStorage.getItem('stash-trash')) || []);
   const [settings, setSettings] = useState(() => {
     const saved = localStorage.getItem('stash-settings');
-    return saved ? JSON.parse(saved) : { blurPreview: false, hoverVideoPlayback: true };
+    const parsed = saved ? JSON.parse(saved) : {};
+    return {
+      blurPreview: false,
+      hoverVideoPlayback: true,
+      theme: 'dark',
+      ...parsed
+    };
   });
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -71,6 +77,8 @@ function App() {
   }, [trashedFiles]);
 
   useEffect(() => {
+    const currentTheme = settings.theme || 'dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
     localStorage.setItem('stash-settings', JSON.stringify(settings));
   }, [settings]);
 
