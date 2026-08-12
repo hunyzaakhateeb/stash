@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { GoogleLogin } from '@react-oauth/google';
 import logo from '../assets/logo.svg';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
@@ -48,6 +49,31 @@ export default function AuthPage({ onAuthSuccess }) {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setIsLoading(true);
+    setError('');
+    try {
+      const response = await fetch(`${API_URL}/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: credentialResponse.credential }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        onAuthSuccess(data.token, data.user);
+      } else {
+        setError(data.error || 'Google Sign-In failed.');
+      }
+    } catch (err) {
+      console.error('Google Auth Error:', err);
+      setError('Failed to connect to Google authentication server.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="auth-page-container">
       <div className="auth-card">
@@ -58,6 +84,24 @@ export default function AuthPage({ onAuthSuccess }) {
           <p className="auth-subtitle">
             {isLogin ? 'Welcome back! Sign in to access your cloud vault.' : 'Create an account to stash and manage your files securely.'}
           </p>
+        </div>
+
+        {/* Google OAuth Section */}
+        <div className="google-auth-wrapper" style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => setError('Google Sign-In was cancelled or failed.')}
+            shape="pill"
+            theme="filled_black"
+            text="continue_with"
+            width="340"
+          />
+
+          <div style={{ display: 'flex', alignItems: 'center', width: '100%', margin: '18px 0 6px 0', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+            <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }}></div>
+            <span style={{ padding: '0 12px', fontWeight: 500, letterSpacing: '0.5px' }}>OR</span>
+            <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }}></div>
+          </div>
         </div>
 
         {/* Tab Switcher */}

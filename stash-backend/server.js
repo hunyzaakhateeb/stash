@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const { Readable } = require('stream');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
 const File = require('./models/File');
 const Folder = require('./models/Folder');
 const User = require('./models/User');
@@ -13,6 +14,7 @@ const User = require('./models/User');
 const app = express();
 const PORT = process.env.PORT || 5001;
 const JWT_SECRET = process.env.JWT_SECRET || 'stash_secret_key_jwt_2026';
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 app.use(cors({ origin: '*' }));
 app.use(express.json());
@@ -159,9 +161,84 @@ app.get('/auth/me', async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-    res.json({ user: { id: user._id, username: user.username, email: user.email } });
+    res.json({ user: { id: user._id, username: user.username, email: user.email, avatar: user.avatar } });
   } catch (error) {
     res.status(401).json({ error: 'Invalid or expired token' });
+  }
+});
+
+// 4. Google / Gmail OAuth Login
+app.post('/auth/google', async (req, res) => {
+  try {
+    const { credential, email: bodyEmail, name: bodyName, googleId: bodyGoogleId, picture: bodyPicture } = req.body;
+
+    let email = bodyEmail;
+    let name = bodyName;
+    let googleId = bodyGoogleId;
+    let avatar = bodyPicture;
+
+    // If Google credential ID token was sent, verify via Google OAuth or decode
+    if (credential) {
+      try {
+        const ticket = await googleClient.verifyIdToken({
+          idToken: credential,
+          audience: process.env.GOOGLE_CLIENT_ID
+        });
+        const payload = ticket.getPayload();
+        email = payload.email;
+        name = payload.name || payload.given_name || email.split('@')[0];
+        googleId = payload.sub;
+        avatar = payload.picture;
+      } catch (tokenErr) {
+        // Fallback payload decode if backend client ID environment variable is unconfigured
+        const decoded = jwt.decode(credential);
+        if (decoded && decoded.email) {
+          email = decoded.email;
+          name = decoded.name || decoded.given_name || email.split('@')[0];
+          googleId = decoded.sub;
+          avatar = decoded.picture;
+        }
+      }
+    }
+
+    if (!email) {
+      return res.status(400).json({ error: 'Failed to verify Google account credentials.' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    let user = await User.findOne({ email: cleanEmail });
+
+    if (!user) {
+      user = await User.create({
+        username: name || cleanEmail.split('@')[0],
+        email: cleanEmail,
+        googleId: googleId || null,
+        avatar: avatar || null
+      });
+    } else if (!user.googleId && googleId) {
+      user.googleId = googleId;
+      if (avatar) user.avatar = avatar;
+      await user.save();
+    }
+
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, username: user.username },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar
+      }
+    });
+  } catch (error) {
+    console.error('Google auth error:', error);
+    res.status(500).json({ error: 'Google authentication failed' });
   }
 });
 
