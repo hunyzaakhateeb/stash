@@ -6,15 +6,27 @@ const mongoose = require('mongoose');
 const { Readable } = require('stream');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 const { OAuth2Client } = require('google-auth-library');
 const File = require('./models/File');
 const Folder = require('./models/Folder');
 const User = require('./models/User');
+const Otp = require('./models/Otp');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
 const JWT_SECRET = process.env.JWT_SECRET || 'stash_secret_key_jwt_2026';
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: process.env.SMTP_SECURE === 'true',
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  }
+});
 
 app.use(cors({ origin: '*' }));
 app.use(express.json());
@@ -66,7 +78,121 @@ function formatBytes(bytes) {
 
 // --- AUTH ROUTES ---
 
-// 1. User Registration
+// 1. Generate & Send OTP Email (Signup Step 1)
+app.post(['/auth/send-otp', '/signup', '/auth/signup'], async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Please provide a valid email address.' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const existingUser = await User.findOne({ email: cleanEmail });
+    if (existingUser) {
+      return res.status(400).json({ error: 'An account with this email already exists.' });
+    }
+
+    // Generate 6-digit OTP
+    const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Delete existing OTPs for this email if any
+    await Otp.deleteMany({ email: cleanEmail });
+
+    // Save OTP to collection with 10-minute TTL
+    await Otp.create({
+      email: cleanEmail,
+      otp: generatedOtp
+    });
+
+    // Send email using Nodemailer
+    if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+      try {
+        await transporter.sendMail({
+          from: `"Stash Security" <${process.env.SMTP_USER}>`,
+          to: cleanEmail,
+          subject: '🔒 Your Stash Verification Code',
+          html: `
+            <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #0d1117; color: #ffffff; border-radius: 10px;">
+              <h2 style="color: #19a7ff;">Stash Email Verification</h2>
+              <p>Your 6-digit OTP security code is:</p>
+              <h1 style="font-size: 32px; letter-spacing: 6px; color: #19a7ff; background: #161b22; padding: 10px 20px; display: inline-block; border-radius: 8px;">${generatedOtp}</h1>
+              <p style="color: #8b949e; font-size: 12px; margin-top: 20px;">This code will expire automatically in 10 minutes. If you did not request this, please ignore this email.</p>
+            </div>
+          `
+        });
+      } catch (mailErr) {
+        console.warn('Nodemailer send warning:', mailErr.message);
+      }
+    } else {
+      console.log(`\n========================================`);
+      console.log(`🔑 OTP SECURITY CODE FOR ${cleanEmail}: ${generatedOtp}`);
+      console.log(`========================================\n`);
+    }
+
+    res.json({ message: 'OTP verification code sent to your email.', email: cleanEmail });
+  } catch (error) {
+    console.error('Send OTP error:', error);
+    res.status(500).json({ error: 'Failed to generate and send OTP code.' });
+  }
+});
+
+// 2. Verify OTP & Create User Account (Signup Step 2)
+app.post(['/auth/verify-otp', '/verify-otp'], async (req, res) => {
+  try {
+    const { email, otp, username, password } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json({ error: 'Please provide email and 6-digit OTP code.' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const otpRecord = await Otp.findOne({ email: cleanEmail, otp: otp.trim() });
+
+    if (!otpRecord) {
+      return res.status(400).json({ error: 'Invalid or expired OTP verification code.' });
+    }
+
+    let user = await User.findOne({ email: cleanEmail });
+    if (!user) {
+      if (!username || !password) {
+        return res.status(400).json({ error: 'Username and password are required to complete registration.' });
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      user = await User.create({
+        username: username.trim(),
+        email: cleanEmail,
+        password: hashedPassword
+      });
+    }
+
+    // Delete verified OTP record
+    await Otp.deleteMany({ email: cleanEmail });
+
+    // Issue JWT token
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, username: user.username },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.status(201).json({
+      message: 'Email verified and account created successfully!',
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email
+      }
+    });
+  } catch (error) {
+    console.error('Verify OTP error:', error);
+    res.status(500).json({ error: 'Failed to verify OTP and create account.' });
+  }
+});
+
+// 3. User Registration Direct Endpoint (Fallback)
 app.post('/auth/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
