@@ -96,15 +96,18 @@ body {
   justify-content: flex-end;
 }
 
-/* --- Add Button --- */
-.add-button {
-  background: transparent;
-  border: 1px solid var(--text-primary);
+/* --- Add & New Folder Buttons --- */
+.add-button,
+.create-folder-btn {
+  background: var(--bg-surface-elevated, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border-color);
   color: var(--text-primary);
-  padding: 8px 20px;
-  border-radius: 12px;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -112,16 +115,19 @@ body {
   outline: none;
 }
 
-.add-button .add-svg-icon {
+.add-button .add-svg-icon,
+.create-folder-btn .add-svg-icon {
   width: 16px;
   height: 16px;
   filter: invert(1);
   transition: filter 0.2s ease;
 }
 
-.add-button:hover {
+.add-button:hover,
+.create-folder-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
   border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
+  color: var(--text-primary);
 }
 
 .add-button:hover .add-svg-icon {
@@ -724,30 +730,6 @@ body {
   margin-bottom: 20px;
 }
 
-.create-folder-btn {
-  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-  color: #0d1117;
-  border: none;
-  padding: 8px 18px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.create-folder-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
-}
-
-.create-folder-btn .add-svg-icon {
-  filter: invert(0) !important;
-}
-
 .folder-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -755,20 +737,19 @@ body {
 }
 
 .folder-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  background: var(--bg-surface-elevated, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
   padding: 16px;
   cursor: pointer;
   transition: all 0.25s ease;
-  backdrop-filter: blur(10px);
 }
 
 .folder-card:hover {
   background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(0, 242, 254, 0.4);
+  border-color: var(--accent-cyan);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .folder-card-header {
@@ -779,20 +760,23 @@ body {
 }
 
 .folder-icon-wrapper {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.folder-card-svg {
-  width: 24px;
-  height: 24px;
-  filter: invert(70%) sepia(80%) saturate(1000%) hue-rotate(150deg);
+.folder-card-svg,
+.breadcrumb-svg,
+.folder-item-svg {
+  width: 22px;
+  height: 22px;
+  filter: invert(1);
+  opacity: 0.9;
 }
 
 .folder-delete-btn {
@@ -834,37 +818,16 @@ body {
   align-items: center;
   gap: 16px;
   margin-bottom: 20px;
-}
-
-.back-btn {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: var(--text-primary);
-  padding: 6px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.2s ease;
-}
-
-.back-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: var(--accent-cyan);
+  width: 100%;
 }
 
 .breadcrumb-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: white;
-  font-size: 1.2rem;
+  gap: 10px;
+  color: var(--text-primary);
+  font-size: 1.25rem;
   font-weight: 600;
-}
-
-.breadcrumb-svg {
-  width: 22px;
-  height: 22px;
-  filter: invert(75%) sepia(80%) saturate(1000%) hue-rotate(150deg);
 }
 
 /* --- Move File Modal Selection List --- */
@@ -882,7 +845,7 @@ body {
   gap: 12px;
   padding: 10px 14px;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -893,14 +856,8 @@ body {
 }
 
 .folder-select-item.selected {
-  background: rgba(0, 242, 254, 0.12);
-  border-color: #00f2fe;
-}
-
-.folder-item-svg {
-  width: 20px;
-  height: 20px;
-  filter: invert(75%) sepia(80%) saturate(1000%) hue-rotate(150deg);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent-cyan);
 }
 
 .folder-item-icon {
@@ -914,7 +871,7 @@ body {
 }
 
 .folder-item-info strong {
-  color: white;
+  color: var(--text-primary);
   font-size: 0.9rem;
 }
 
@@ -924,7 +881,7 @@ body {
 }
 
 .check-mark {
-  color: #00f2fe;
+  color: var(--accent-cyan);
   font-size: 1rem;
   font-weight: bold;
 }

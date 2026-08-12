@@ -8,6 +8,7 @@ import CreateFolderModal from './components/CreateFolderModal';
 import MoveFileModal from './components/MoveFileModal';
 import plusIcon from './assets/icons/plus.svg';
 import folderIcon from './assets/icons/folder.svg';
+import backIcon from './assets/icons/back.svg';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
@@ -236,12 +237,22 @@ function App() {
             <div className="folders-header-bar">
               {selectedFolder ? (
                 <div className="breadcrumb-nav">
-                  <button className="back-btn" onClick={() => setSelectedFolder(null)}>
-                    ← Back to Folders
+                  <button 
+                    className="settings-icon-btn" 
+                    onClick={() => setSelectedFolder(null)} 
+                    title="Back to Folders"
+                  >
+                    <img src={backIcon} alt="Back" className="settings-svg" />
                   </button>
                   <div className="breadcrumb-title">
                     <img src={folderIcon} alt="Folder" className="breadcrumb-svg" />
                     <span>{selectedFolder.name}</span>
+                  </div>
+                  <div className="folder-action-center" style={{ marginLeft: 'auto' }}>
+                    <button className="add-button" onClick={() => setIsModalOpen(true)}>
+                      <img src={plusIcon} alt="Add" className="add-svg-icon" />
+                      Add to {selectedFolder.name}
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -281,9 +292,17 @@ function App() {
         {(activeTab !== 'Folders' || selectedFolder) && (
           <div className="file-grid">
             {displayFiles.length === 0 ? (
-              <p style={{ color: 'var(--text-muted)', gridColumn: '1 / -1', textAlign: 'center', marginTop: '40px' }}>
-                {selectedFolder ? `No files in ${selectedFolder.name}.` : `No files found in ${activeTab}.`}
-              </p>
+              <div style={{ gridColumn: '1 / -1', textAlign: 'center', marginTop: '40px' }}>
+                <p style={{ color: 'var(--text-muted)', marginBottom: '16px' }}>
+                  {selectedFolder ? `No files in ${selectedFolder.name} yet.` : `No files found in ${activeTab}.`}
+                </p>
+                {selectedFolder && (
+                  <button className="add-button" style={{ margin: '0 auto' }} onClick={() => setIsModalOpen(true)}>
+                    <img src={plusIcon} alt="Add" className="add-svg-icon" />
+                    Upload Files to {selectedFolder.name}
+                  </button>
+                )}
+              </div>
             ) : (
               filesToRender.map((file) => (
                 <FileCard
