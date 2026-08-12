@@ -118,7 +118,8 @@ function App() {
   const toggleFavorite = async (file) => {
     try {
       if (file._id) {
-        await fetch(`${API_URL}/files/${file._id}/favorite`, { method: 'PATCH' });
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        await fetch(`${API_URL}/files/${file._id}/favorite`, { method: 'PATCH', headers });
         fetchVaultFiles();
       } else {
         const identifier = file.name;
@@ -137,9 +138,13 @@ function App() {
     } else {
       try {
         if (file._id) {
+          const headers = {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+          };
           await fetch(`${API_URL}/files/${file._id}/trash`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify({ isTrashed: true }),
           });
           fetchVaultFiles();
@@ -156,9 +161,13 @@ function App() {
   const restoreFromTrash = async (file) => {
     try {
       if (file._id) {
+        const headers = {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        };
         await fetch(`${API_URL}/files/${file._id}/trash`, {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify({ isTrashed: false }),
         });
         fetchVaultFiles();
@@ -175,8 +184,10 @@ function App() {
     if (!fileToDelete) return;
     try {
       const targetId = fileToDelete._id || encodeURIComponent(fileToDelete.name);
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
       const response = await fetch(`${API_URL}/files/${targetId}`, {
         method: 'DELETE',
+        headers
       });
       if (response.ok) {
         fetchVaultFiles();
@@ -195,8 +206,10 @@ function App() {
   const executeFolderDelete = async () => {
     if (!folderToDelete) return;
     try {
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
       const response = await fetch(`${API_URL}/folders/${folderToDelete._id}`, {
         method: 'DELETE',
+        headers
       });
       if (response.ok) {
         fetchFolders();

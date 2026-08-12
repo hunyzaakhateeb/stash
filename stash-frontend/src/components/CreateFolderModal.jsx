@@ -15,9 +15,13 @@ export default function CreateFolderModal({ onClose, onCreated }) {
 
     setIsSubmitting(true);
     try {
+      const token = localStorage.getItem('stash-token');
       const response = await fetch(`${API_URL}/folders`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({ name: folderName.trim() }),
       });
 

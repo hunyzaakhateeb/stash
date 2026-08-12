@@ -10,9 +10,13 @@ export default function MoveFileModal({ file, folders, onClose, onMoved }) {
   const handleMove = async () => {
     setIsMoving(true);
     try {
+      const token = localStorage.getItem('stash-token');
       const response = await fetch(`${API_URL}/files/${file._id}/move`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({ folderId: selectedFolderId }),
       });
 

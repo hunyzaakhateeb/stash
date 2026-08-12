@@ -394,6 +394,10 @@ app.get('/', (req, res) => {
 // 1. UPLOAD FILE(S) TO MONGODB GRIDFS
 app.post('/upload', upload.any(), async (req, res) => {
   try {
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Unauthorized: Please sign in to access your private vault.' });
+    }
+
     const filesToUpload = req.files || (req.file ? [req.file] : []);
     if (filesToUpload.length === 0) return res.status(400).json({ error: 'No file provided.' });
     if (!gridfsBucket) return res.status(500).json({ error: 'GridFS storage bucket not ready.' });
@@ -433,7 +437,7 @@ app.post('/upload', upload.any(), async (req, res) => {
               isFavorite: false,
               isTrashed: false,
               folderId: targetFolderId ? new mongoose.Types.ObjectId(targetFolderId) : null,
-              userId: req.userId || null
+              userId: new mongoose.Types.ObjectId(req.userId)
             });
 
             await newFile.save();
@@ -465,11 +469,14 @@ app.post('/upload', upload.any(), async (req, res) => {
   }
 });
 
-// 2. FETCH ALL FILES FROM MONGODB
+// 2. FETCH ALL FILES FROM USER WORKSPACE
 app.get('/files', async (req, res) => {
   try {
-    const fileFilter = req.userId ? { $or: [{ userId: req.userId }, { userId: null }] } : {};
-    const files = await File.find(fileFilter).sort({ createdAt: -1 });
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Unauthorized: Please sign in to access your vault.' });
+    }
+
+    const files = await File.find({ userId: new mongoose.Types.ObjectId(req.userId) }).sort({ createdAt: -1 });
     const host = req.get('host');
     const protocol = req.protocol;
 
@@ -546,8 +553,10 @@ app.get('/files/download/:id', async (req, res) => {
 // 5. TOGGLE FAVORITE STATUS
 app.patch('/files/:id/favorite', async (req, res) => {
   try {
-    const fileDoc = await File.findById(req.params.id);
-    if (!fileDoc) return res.status(404).json({ error: 'File not found' });
+    if (!req.userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const fileDoc = await File.findOne({ _id: req.params.id, userId: req.userId });
+    if (!fileDoc) return res.status(404).json({ error: 'File not found in your workspace' });
 
     fileDoc.isFavorite = !fileDoc.isFavorite;
     await fileDoc.save();
@@ -562,9 +571,11 @@ app.patch('/files/:id/favorite', async (req, res) => {
 // 6. MOVE TO TRASH / RESTORE FROM TRASH
 app.patch('/files/:id/trash', async (req, res) => {
   try {
+    if (!req.userId) return res.status(401).json({ error: 'Unauthorized' });
+
     const { isTrashed } = req.body;
-    const fileDoc = await File.findById(req.params.id);
-    if (!fileDoc) return res.status(404).json({ error: 'File not found' });
+    const fileDoc = await File.findOne({ _id: req.params.id, userId: req.userId });
+    if (!fileDoc) return res.status(404).json({ error: 'File not found in your workspace' });
 
     fileDoc.isTrashed = typeof isTrashed === 'boolean' ? isTrashed : !fileDoc.isTrashed;
     await fileDoc.save();
@@ -579,9 +590,11 @@ app.patch('/files/:id/trash', async (req, res) => {
 // 7. SHIFT / MOVE FILE TO A FOLDER (OR ROOT)
 app.patch('/files/:id/move', async (req, res) => {
   try {
+    if (!req.userId) return res.status(401).json({ error: 'Unauthorized' });
+
     const { folderId } = req.body;
-    const fileDoc = await File.findById(req.params.id);
-    if (!fileDoc) return res.status(404).json({ error: 'File not found' });
+    const fileDoc = await File.findOne({ _id: req.params.id, userId: req.userId });
+    if (!fileDoc) return res.status(404).json({ error: 'File not found in your workspace' });
 
     fileDoc.folderId = folderId ? new mongoose.Types.ObjectId(folderId) : null;
     await fileDoc.save();
@@ -596,10 +609,12 @@ app.patch('/files/:id/move', async (req, res) => {
 // 8. PERMANENTLY DELETE FILE
 app.delete('/files/:id', async (req, res) => {
   try {
-    const fileDoc = await File.findById(req.params.id);
+    if (!req.userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const fileDoc = await File.findOne({ _id: req.params.id, userId: req.userId });
     
     if (!fileDoc) {
-      return res.status(404).json({ error: 'File not found in database' });
+      return res.status(404).json({ error: 'File not found in your workspace' });
     }
 
     if (gridfsBucket && fileDoc.gridFsFileId) {
@@ -621,9 +636,13 @@ app.delete('/files/:id', async (req, res) => {
 
 // --- FOLDER ROUTES ---
 
-// 9. CREATE A NEW FOLDER
+// 9. CREATE A NEW FOLDER IN WORKSPACE
 app.post('/folders', async (req, res) => {
   try {
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Unauthorized: Please sign in to create folders.' });
+    }
+
     const { name, color } = req.body;
     if (!name || !name.trim()) {
       return res.status(400).json({ error: 'Folder name is required.' });
@@ -632,7 +651,7 @@ app.post('/folders', async (req, res) => {
     const folder = new Folder({
       name: name.trim(),
       color: color || '#00f2fe',
-      userId: req.userId || null
+      userId: new mongoose.Types.ObjectId(req.userId)
     });
 
     await folder.save();
@@ -643,12 +662,16 @@ app.post('/folders', async (req, res) => {
   }
 });
 
-// 10. GET ALL FOLDERS WITH FILE STATS
+// 10. GET ALL WORKSPACE FOLDERS WITH FILE STATS
 app.get('/folders', async (req, res) => {
   try {
-    const folderFilter = req.userId ? { $or: [{ userId: req.userId }, { userId: null }] } : {};
-    const folders = await Folder.find(folderFilter).sort({ createdAt: -1 });
-    const allFiles = await File.find({ isTrashed: false, ...folderFilter });
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Unauthorized: Please sign in to view folders.' });
+    }
+
+    const userObjectId = new mongoose.Types.ObjectId(req.userId);
+    const folders = await Folder.find({ userId: userObjectId }).sort({ createdAt: -1 });
+    const allFiles = await File.find({ isTrashed: false, userId: userObjectId });
 
     const foldersWithStats = folders.map(folder => {
       const folderFiles = allFiles.filter(file => file.folderId && file.folderId.toString() === folder._id.toString());
@@ -665,18 +688,20 @@ app.get('/folders', async (req, res) => {
   }
 });
 
-// 11. DELETE A FOLDER (UNASSIGN FILES TO ROOT)
+// 11. DELETE A FOLDER IN WORKSPACE
 app.delete('/folders/:id', async (req, res) => {
   try {
+    if (!req.userId) return res.status(401).json({ error: 'Unauthorized' });
+
     const folderId = req.params.id;
-    const folder = await Folder.findByIdAndDelete(folderId);
+    const folder = await Folder.findOneAndDelete({ _id: folderId, userId: req.userId });
 
     if (!folder) {
-      return res.status(404).json({ error: 'Folder not found' });
+      return res.status(404).json({ error: 'Folder not found in your workspace' });
     }
 
     // Unassign files inside this folder back to root vault
-    await File.updateMany({ folderId: new mongoose.Types.ObjectId(folderId) }, { folderId: null });
+    await File.updateMany({ folderId: new mongoose.Types.ObjectId(folderId), userId: req.userId }, { folderId: null });
 
     res.json({ message: 'Folder deleted and contained files unassigned to root vault' });
   } catch (error) {

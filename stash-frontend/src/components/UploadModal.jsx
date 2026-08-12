@@ -49,8 +49,10 @@ export default function UploadModal({ onClose, folderId }) {
     });
 
     try {
+      const token = localStorage.getItem('stash-token');
       const response = await fetch(`${API_URL}/upload`, {
         method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData,
       });
 
