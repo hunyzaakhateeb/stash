@@ -193,7 +193,7 @@ export default function AuthPage({ onAuthSuccess }) {
               onSuccess={handleGoogleSuccess}
               onError={() => setError('Google Sign-In was cancelled or failed.')}
               shape="pill"
-              theme="filled_black"
+              theme={theme === 'dark' ? 'filled_black' : 'outline'}
               text="continue_with"
               width="340"
             />
