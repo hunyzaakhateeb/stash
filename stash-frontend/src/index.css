@@ -1136,6 +1136,16 @@ body {
   border-radius: 10px;
   font-size: 0.85rem;
   margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.banner-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  filter: invert(36%) sepia(85%) saturate(2462%) hue-rotate(345deg) brightness(100%) contrast(105%);
 }
 
 .auth-form {

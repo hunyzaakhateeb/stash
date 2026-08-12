@@ -3,6 +3,8 @@ import { GoogleLogin } from '@react-oauth/google';
 import logo from '../assets/logo.svg';
 import sunIcon from '../assets/icons/sun.svg';
 import moonIcon from '../assets/icons/moon.svg';
+import alertIcon from '../assets/icons/alert.svg';
+import checkIcon from '../assets/icons/check.svg';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
@@ -229,14 +231,16 @@ export default function AuthPage({ onAuthSuccess }) {
         {/* Error Banner */}
         {error && (
           <div className="auth-error-banner">
-            ⚠️ {error}
+            <img src={alertIcon} alt="Alert" className="banner-icon" />
+            <span>{error}</span>
           </div>
         )}
 
         {/* Success Banner */}
         {successMsg && (
-          <div className="auth-success-banner" style={{ background: 'rgba(25, 167, 255, 0.12)', border: '1px solid var(--accent-cyan)', color: 'var(--accent-cyan)', padding: '10px 14px', borderRadius: '10px', fontSize: '0.85rem', marginBottom: '16px' }}>
-            ✉️ {successMsg}
+          <div className="auth-success-banner" style={{ background: 'rgba(25, 167, 255, 0.12)', border: '1px solid var(--accent-cyan)', color: 'var(--accent-cyan)', padding: '10px 14px', borderRadius: '10px', fontSize: '0.85rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <img src={checkIcon} alt="Success" className="banner-icon" style={{ width: '16px', height: '16px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(85%) saturate(2462%) hue-rotate(187deg)' }} />
+            <span>{successMsg}</span>
           </div>
         )}
 
