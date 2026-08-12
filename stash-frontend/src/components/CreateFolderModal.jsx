@@ -40,7 +40,7 @@ export default function CreateFolderModal({ onClose, onCreated }) {
       <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '420px' }}>
         <div className="modal-header">
           <h3>Create New Folder</h3>
-          <button className="close-btn" onClick={onClose}>✕</button>
+          <button className="close-btn" onClick={onClose} title="Close">✕</button>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -59,10 +59,10 @@ export default function CreateFolderModal({ onClose, onCreated }) {
           </div>
 
           <div className="modal-footer">
-            <button type="button" className="cancel-btn" onClick={onClose} disabled={isSubmitting}>
+            <button type="button" className="cancel-btn" onClick={onClose} disabled={isSubmitting} title="Cancel Folder Creation">
               Cancel
             </button>
-            <button type="submit" className="upload-btn" disabled={isSubmitting}>
+            <button type="submit" className="upload-btn" disabled={isSubmitting} title="Create Folder">
               {isSubmitting ? 'Creating...' : 'Create Folder'}
             </button>
           </div>

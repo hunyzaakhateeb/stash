@@ -130,13 +130,13 @@ export default function FileCard({
 
         <div className="hover-actions">
           {isTrashed ? (
-            <button className="action-btn" title="Restore" onClick={(e) => { e.stopPropagation(); onRestore(); }}>
+            <button className="action-btn" title="Restore File" onClick={(e) => { e.stopPropagation(); onRestore(); }}>
               <img src={restoreIcon} alt="Restore" className="action-svg-icon" />
             </button>
           ) : (
             <>
               {/* Favorite Button with Custom SVG */}
-              <button className="action-btn" title="Favorite" onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}>
+              <button className="action-btn" title={isFavorite ? "Remove from Favorites" : "Add to Favorites"} onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}>
                 <img 
                   src={isFavorite ? fillHeartIcon : emptyHeartIcon} 
                   alt="Favorite" 
@@ -145,7 +145,7 @@ export default function FileCard({
               </button>
 
               {/* Download Button with Custom SVG */}
-              <button className="action-btn" title="Download" onClick={handleDownload}>
+              <button className="action-btn" title="Download File" onClick={handleDownload}>
                 <img src={downloadIcon} alt="Download" className="action-svg-icon" />
               </button>
 
@@ -159,7 +159,7 @@ export default function FileCard({
           )}
           
           {/* Delete / Trash Button with Custom SVG */}
-          <button className="action-btn delete-btn" title={isTrashed ? "Permanently Delete" : "Move to Trash"} onClick={(e) => {
+          <button className="action-btn delete-btn" title={isTrashed ? "Permanently Delete File" : "Move to Trash"} onClick={(e) => {
             e.stopPropagation();
             onDelete();
           }}>

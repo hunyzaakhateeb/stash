@@ -85,7 +85,7 @@ export default function UploadModal({ onClose, folderId }) {
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3>Upload to Vault</h3>
-          <button className="close-btn" onClick={onClose}>✕</button>
+          <button className="close-btn" onClick={onClose} title="Close">✕</button>
         </div>
 
         <div 
@@ -93,6 +93,7 @@ export default function UploadModal({ onClose, folderId }) {
           onClick={handleZoneClick}
           onDragOver={handleDragOver}
           onDrop={handleDrop}
+          title="Click or drag files here to upload"
         >
           <div className="dropzone-icon">
             <img src={cloudUploadIcon} alt="Upload" className="cloud-upload-svg" style={{ width: '48px', height: '48px' }} />
@@ -123,13 +124,14 @@ export default function UploadModal({ onClose, folderId }) {
         )}
         
         <div className="modal-footer" style={{ marginTop: '20px' }}>
-          <button className="cancel-btn" onClick={onClose} disabled={isUploading}>
+          <button className="cancel-btn" onClick={onClose} disabled={isUploading} title="Cancel Upload">
             Cancel
           </button>
           <button 
             className="upload-btn" 
             onClick={handleUploadClick}
             disabled={isUploading}
+            title="Stash selected files"
           >
             {isUploading ? "Uploading..." : selectedFiles.length > 1 ? `Upload ${selectedFiles.length} Files` : "Upload File"}
           </button>

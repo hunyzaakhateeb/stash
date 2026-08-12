@@ -58,7 +58,7 @@ export default function Navbar({ onAddClick, onCreateFolderClick, onOpenSettings
             <img src={plusIcon} alt="Plus" className="add-svg-icon" />
             Folder
           </button>
-          <button className="add-button" onClick={onAddClick}>
+          <button className="add-button" onClick={onAddClick} title="Upload Files to Vault">
             <img src={plusIcon} alt="Add" className="add-svg-icon" />
             Add
           </button>
@@ -68,11 +68,13 @@ export default function Navbar({ onAddClick, onCreateFolderClick, onOpenSettings
       <div className="navbar-tabs">
         {tabs.map((tab) => {
           const isActive = activeTab === tab;
+          const tagTitle = tab === 'All' ? "View All Files" : tab === 'Folders' ? "View Folders" : tab === 'Favorites' ? "View Favorite Files" : tab === 'Trash' ? "View Trashed Files" : `View ${tab} Files`;
           return (
             <button 
               key={tab}
               className={`tab ${isActive ? 'active' : ''}`}
               onClick={() => setActiveTab(tab)}
+              title={tagTitle}
             >
               <img src={tabIcons[tab]} alt={`${tab} icon`} className="custom-tab-icon" />
               <span>{tab}</span>

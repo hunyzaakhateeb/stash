@@ -4,7 +4,7 @@ import trashIcon from '../assets/icons/trash.svg';
 
 export default function FolderCard({ folder, onClick, onDelete }) {
   return (
-    <div className="folder-card" onClick={onClick}>
+    <div className="folder-card" onClick={onClick} title={`Open ${folder.name} folder`}>
       <div className="folder-card-header">
         <div className="folder-icon-wrapper">
           <img src={folderIcon} alt="Folder" className="folder-card-svg" />

@@ -29,7 +29,7 @@ export default function SettingsModal({ onClose, settings, onUpdateSettings }) {
       <div className="modal-content settings-modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3>Preferences & Settings</h3>
-          <button className="close-btn" onClick={onClose}>✕</button>
+          <button className="close-btn" onClick={onClose} title="Close Settings">✕</button>
         </div>
 
         <div className="settings-section">
@@ -46,6 +46,7 @@ export default function SettingsModal({ onClose, settings, onUpdateSettings }) {
                 type="button"
                 className={`theme-btn ${currentTheme === 'dark' ? 'active' : ''}`}
                 onClick={() => handleThemeChange('dark')}
+                title="Switch to Dark Theme"
               >
                 Dark
               </button>
@@ -53,6 +54,7 @@ export default function SettingsModal({ onClose, settings, onUpdateSettings }) {
                 type="button"
                 className={`theme-btn ${currentTheme === 'light' ? 'active' : ''}`}
                 onClick={() => handleThemeChange('light')}
+                title="Switch to Light Theme"
               >
                 Light
               </button>
