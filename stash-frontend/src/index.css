@@ -119,8 +119,8 @@ body {
 .create-folder-btn .add-svg-icon {
   width: 16px;
   height: 16px;
-  filter: invert(1);
-  transition: filter 0.2s ease;
+  filter: invert(53%) sepia(85%) saturate(2462%) hue-rotate(187deg) brightness(103%) contrast(101%);
+  transition: transform 0.2s ease;
 }
 
 .add-button:hover,
@@ -130,8 +130,9 @@ body {
   color: var(--text-primary);
 }
 
-.add-button:hover .add-svg-icon {
-  filter: invert(80%) sepia(50%) saturate(1000%) hue-rotate(140deg);
+.add-button:hover .add-svg-icon,
+.create-folder-btn:hover .add-svg-icon {
+  transform: scale(1.15);
 }
 
 /* --- Tabs --- */
@@ -617,7 +618,8 @@ body {
 .settings-svg {
   width: 20px;
   height: 20px;
-  opacity: 0.85;
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
 }
 
 .settings-modal-content {
@@ -775,7 +777,7 @@ body {
 .folder-item-svg {
   width: 22px;
   height: 22px;
-  filter: invert(1);
+  filter: brightness(0) invert(1);
   opacity: 0.9;
 }
 

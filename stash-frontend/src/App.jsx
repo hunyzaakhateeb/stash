@@ -248,12 +248,6 @@ function App() {
                     <img src={folderIcon} alt="Folder" className="breadcrumb-svg" />
                     <span>{selectedFolder.name}</span>
                   </div>
-                  <div className="folder-action-center" style={{ marginLeft: 'auto' }}>
-                    <button className="add-button" onClick={() => setIsModalOpen(true)}>
-                      <img src={plusIcon} alt="Add" className="add-svg-icon" />
-                      Add to {selectedFolder.name}
-                    </button>
-                  </div>
                 </div>
               ) : (
                 <div className="folders-toolbar">
@@ -265,6 +259,16 @@ function App() {
                 </div>
               )}
             </div>
+
+            {/* Centered Upload Button inside an open folder */}
+            {selectedFolder && (
+              <div className="folder-upload-center" style={{ display: 'flex', justifyContent: 'center', margin: '20px 0' }}>
+                <button className="add-button" onClick={() => setIsModalOpen(true)}>
+                  <img src={plusIcon} alt="Upload" className="add-svg-icon" />
+                  Upload Files to {selectedFolder.name}
+                </button>
+              </div>
+            )}
 
             {/* Folder Cards Grid (when no folder is selected) */}
             {!selectedFolder && (
@@ -293,15 +297,9 @@ function App() {
           <div className="file-grid">
             {displayFiles.length === 0 ? (
               <div style={{ gridColumn: '1 / -1', textAlign: 'center', marginTop: '40px' }}>
-                <p style={{ color: 'var(--text-muted)', marginBottom: '16px' }}>
+                <p style={{ color: 'var(--text-muted)' }}>
                   {selectedFolder ? `No files in ${selectedFolder.name} yet.` : `No files found in ${activeTab}.`}
                 </p>
-                {selectedFolder && (
-                  <button className="add-button" style={{ margin: '0 auto' }} onClick={() => setIsModalOpen(true)}>
-                    <img src={plusIcon} alt="Add" className="add-svg-icon" />
-                    Upload Files to {selectedFolder.name}
-                  </button>
-                )}
               </div>
             ) : (
               filesToRender.map((file) => (
