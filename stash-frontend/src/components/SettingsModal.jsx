@@ -1,6 +1,7 @@
 import React from 'react';
 import sunIcon from '../assets/icons/sun.svg';
 import moonIcon from '../assets/icons/moon.svg';
+import xIcon from '../assets/icons/x.svg';
 
 export default function SettingsModal({ onClose, settings, onUpdateSettings }) {
   const currentTheme = settings.theme || 'dark';
@@ -31,7 +32,9 @@ export default function SettingsModal({ onClose, settings, onUpdateSettings }) {
       <div className="modal-content settings-modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3>Preferences & Settings</h3>
-          <button className="close-btn" onClick={onClose} title="Close Settings">✕</button>
+          <button className="close-btn" onClick={onClose} title="Close Settings">
+            <img src={xIcon} alt="Close" className="close-svg-icon" />
+          </button>
         </div>
 
         <div className="settings-section">

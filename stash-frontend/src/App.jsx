@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import FileCard from './components/FileCard';
 import FolderCard from './components/FolderCard';
@@ -14,6 +15,7 @@ import backIcon from './assets/icons/back.svg';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 function App() {
+  const navigate = useNavigate();
   const [token, setToken] = useState(() => localStorage.getItem('stash-token') || null);
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem('stash-user');
@@ -55,6 +57,7 @@ function App() {
     setCurrentUser(user);
     localStorage.setItem('stash-token', newToken);
     localStorage.setItem('stash-user', JSON.stringify(user));
+    navigate('/');
   };
 
   const handleLogout = () => {
@@ -62,6 +65,7 @@ function App() {
     setCurrentUser(null);
     localStorage.removeItem('stash-token');
     localStorage.removeItem('stash-user');
+    navigate('/login');
   };
 
   const fetchVaultFiles = async () => {
@@ -265,10 +269,15 @@ function App() {
   const filesToRender = displayFiles.slice(0, visibleCount);
 
   if (!token) {
-    return <AuthPage onAuthSuccess={handleAuthSuccess} />;
+    return (
+      <Routes>
+        <Route path="/login" element={<AuthPage onAuthSuccess={handleAuthSuccess} />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
   }
 
-  return (
+  const vaultContent = (
     <div className="stash-app">
       <Navbar
         onAddClick={() => setIsModalOpen(true)}
@@ -474,7 +483,15 @@ function App() {
         </div>
       )}
     </div>
-  )
+  );
+
+  return (
+    <Routes>
+      <Route path="/" element={vaultContent} />
+      <Route path="/login" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
 }
 
 export default App;

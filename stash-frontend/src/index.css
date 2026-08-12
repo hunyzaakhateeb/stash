@@ -536,6 +536,25 @@ body {
   color: var(--text-primary);
 }
 
+.close-svg-icon {
+  width: 14px;
+  height: 14px;
+  display: block;
+  filter: var(--icon-filter);
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.close-btn:hover .close-svg-icon {
+  opacity: 1;
+}
+
+.check-svg-icon {
+  width: 16px;
+  height: 16px;
+  filter: invert(53%) sepia(85%) saturate(2462%) hue-rotate(187deg);
+}
+
 .modal-text-input {
   width: 100%;
   padding: 12px 16px;

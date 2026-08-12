@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import xIcon from '../assets/icons/x.svg';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
@@ -44,7 +45,9 @@ export default function CreateFolderModal({ onClose, onCreated }) {
       <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '420px' }}>
         <div className="modal-header">
           <h3>Create New Folder</h3>
-          <button className="close-btn" onClick={onClose} title="Close">✕</button>
+          <button className="close-btn" onClick={onClose} title="Close">
+            <img src={xIcon} alt="Close" className="close-svg-icon" />
+          </button>
         </div>
 
         <form onSubmit={handleSubmit}>

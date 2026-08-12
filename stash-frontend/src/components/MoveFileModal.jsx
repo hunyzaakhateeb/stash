@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import folderIcon from '../assets/icons/folder.svg';
+import vaultIcon from '../assets/icons/vault.svg';
+import checkIcon from '../assets/icons/check.svg';
+import xIcon from '../assets/icons/x.svg';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
@@ -39,7 +42,9 @@ export default function MoveFileModal({ file, folders, onClose, onMoved }) {
       <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '440px' }}>
         <div className="modal-header">
           <h3>Shift / Move File</h3>
-          <button className="close-btn" onClick={onClose}>✕</button>
+          <button className="close-btn" onClick={onClose} title="Close">
+            <img src={xIcon} alt="Close" className="close-svg-icon" />
+          </button>
         </div>
 
         <div style={{ margin: '15px 0' }}>
@@ -48,22 +53,24 @@ export default function MoveFileModal({ file, folders, onClose, onMoved }) {
           </p>
 
           <div className="folder-selection-list">
-            <div
+            <div 
               className={`folder-select-item ${selectedFolderId === null ? 'selected' : ''}`}
               onClick={() => setSelectedFolderId(null)}
             >
-              <div className="folder-item-icon">🌐</div>
+              <img src={vaultIcon} alt="Vault" className="folder-item-svg" />
               <div className="folder-item-info">
                 <strong>Main Vault (No Folder)</strong>
                 <span>Root directory</span>
               </div>
-              {selectedFolderId === null && <span className="check-mark">✓</span>}
+              {selectedFolderId === null && (
+                <img src={checkIcon} alt="Selected" className="check-svg-icon" />
+              )}
             </div>
 
             {folders.map((folder) => {
               const isSelected = selectedFolderId === folder._id;
               return (
-                <div
+                <div 
                   key={folder._id}
                   className={`folder-select-item ${isSelected ? 'selected' : ''}`}
                   onClick={() => setSelectedFolderId(folder._id)}
@@ -73,7 +80,9 @@ export default function MoveFileModal({ file, folders, onClose, onMoved }) {
                     <strong>{folder.name}</strong>
                     <span>{folder.fileCount || 0} files</span>
                   </div>
-                  {isSelected && <span className="check-mark">✓</span>}
+                  {isSelected && (
+                    <img src={checkIcon} alt="Selected" className="check-svg-icon" />
+                  )}
                 </div>
               );
             })}

@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import cloudUploadIcon from '../assets/icons/cloud_upload.svg';
+import xIcon from '../assets/icons/x.svg';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
@@ -87,7 +88,9 @@ export default function UploadModal({ onClose, folderId }) {
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3>Upload to Vault</h3>
-          <button className="close-btn" onClick={onClose} title="Close">✕</button>
+          <button className="close-btn" onClick={onClose} title="Close">
+            <img src={xIcon} alt="Close" className="close-svg-icon" />
+          </button>
         </div>
 
         <div 
