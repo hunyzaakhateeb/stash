@@ -1,14 +1,11 @@
 import { useState } from 'react';
 import folderIcon from '../assets/icons/folder.svg';
-import { getCleanFileName } from '../utils/cleanName';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 export default function MoveFileModal({ file, folders, onClose, onMoved }) {
   const [selectedFolderId, setSelectedFolderId] = useState(file.folderId || null);
   const [isMoving, setIsMoving] = useState(false);
-
-  const cleanName = getCleanFileName(file.displayName || file.name);
 
   const handleMove = async () => {
     setIsMoving(true);
@@ -38,16 +35,16 @@ export default function MoveFileModal({ file, folders, onClose, onMoved }) {
       <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '440px' }}>
         <div className="modal-header">
           <h3>Shift / Move File</h3>
-          <button className="close-btn" onClick={onClose} title="Close">✕</button>
+          <button className="close-btn" onClick={onClose}>✕</button>
         </div>
 
         <div style={{ margin: '15px 0' }}>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '15px' }}>
-            Select destination for <strong style={{ color: 'var(--text-primary)' }}>{cleanName}</strong>:
+            Select destination for <strong style={{ color: 'var(--text-primary)' }}>{file.displayName || file.name?.replace(/^\d+-/, '')}</strong>:
           </p>
 
           <div className="folder-selection-list">
-            <div 
+            <div
               className={`folder-select-item ${selectedFolderId === null ? 'selected' : ''}`}
               onClick={() => setSelectedFolderId(null)}
             >
@@ -62,7 +59,7 @@ export default function MoveFileModal({ file, folders, onClose, onMoved }) {
             {folders.map((folder) => {
               const isSelected = selectedFolderId === folder._id;
               return (
-                <div 
+                <div
                   key={folder._id}
                   className={`folder-select-item ${isSelected ? 'selected' : ''}`}
                   onClick={() => setSelectedFolderId(folder._id)}

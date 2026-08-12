@@ -217,17 +217,7 @@ body {
 
 .tab.active .custom-tab-icon {
   opacity: 1;
-  filter: drop-shadow(0 0 8px var(--accent-cyan));
-}
-
-.tab.active .folder-tab-icon {
-  opacity: 1;
-  filter: brightness(0) invert(1) drop-shadow(0 0 8px var(--accent-cyan)) !important;
-}
-
-[data-theme="light"] .tab.active .folder-tab-icon {
-  opacity: 1;
-  filter: brightness(0) drop-shadow(0 0 6px var(--accent-cyan)) !important;
+  filter: brightness(0) invert(1) drop-shadow(0 0 8px var(--accent-cyan));
 }
 
 /* --- Custom Logo --- */

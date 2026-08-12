@@ -10,12 +10,12 @@ import favIcon from '../assets/icons/fill_heart.svg';
 import trashIcon from '../assets/icons/trash.svg';
 import folderIcon from '../assets/icons/folder.svg';
 import logo from '../assets/logo.svg';
-import searchIcon from '../assets/search-icon.svg'; 
+import searchIcon from '../assets/search-icon.svg';
 import settingsIcon from '../assets/icons/settings.svg';
 import plusIcon from '../assets/icons/plus.svg';
 
 export default function Navbar({ onAddClick, onCreateFolderClick, onOpenSettings, activeTab, setActiveTab, searchQuery, setSearchQuery }) {
-  
+
   const tabIcons = {
     'All': allIcon,
     'Folders': folderIcon,
@@ -36,14 +36,14 @@ export default function Navbar({ onAddClick, onCreateFolderClick, onOpenSettings
           <img src={logo} alt="Stash Logo" className="custom-logo" />
           <h2 className="logo-text">Stash</h2>
         </div>
-        
+
         <div className="search-section">
           <div className="search-container">
             <img src={searchIcon} alt="Search" className="search-svg" />
-            <input 
-              type="text" 
-              placeholder="Find something..." 
-              className="search-input" 
+            <input
+              type="text"
+              placeholder="Find something..."
+              className="search-input"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -70,13 +70,13 @@ export default function Navbar({ onAddClick, onCreateFolderClick, onOpenSettings
           const isActive = activeTab === tab;
           const tagTitle = tab === 'All' ? "View All Files" : tab === 'Folders' ? "View Folders" : tab === 'Favorites' ? "View Favorite Files" : tab === 'Trash' ? "View Trashed Files" : `View ${tab} Files`;
           return (
-            <button 
+            <button
               key={tab}
               className={`tab ${isActive ? 'active' : ''}`}
               onClick={() => setActiveTab(tab)}
               title={tagTitle}
             >
-              <img src={tabIcons[tab]} alt={`${tab} icon`} className={`custom-tab-icon ${tab === 'Folders' ? 'folder-tab-icon' : ''}`} />
+              <img src={tabIcons[tab]} alt={`${tab} icon`} className="custom-tab-icon" />
               <span>{tab}</span>
             </button>
           );

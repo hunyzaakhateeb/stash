@@ -9,7 +9,6 @@ import MoveFileModal from './components/MoveFileModal';
 import plusIcon from './assets/icons/plus.svg';
 import folderIcon from './assets/icons/folder.svg';
 import backIcon from './assets/icons/back.svg';
-import { getCleanFileName } from './utils/cleanName';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
@@ -18,16 +17,16 @@ function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
   const [fileToMove, setFileToMove] = useState(null);
-  
+
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
   const [selectedFolder, setSelectedFolder] = useState(null);
-  
+
   const [fileToDelete, setFileToDelete] = useState(null);
   const [folderToDelete, setFolderToDelete] = useState(null);
 
   const [activeTab, setActiveTab] = useState('All');
-  
+
   const [favorites, setFavorites] = useState(() => JSON.parse(localStorage.getItem('stash-favorites')) || []);
   const [trashedFiles, setTrashedFiles] = useState(() => JSON.parse(localStorage.getItem('stash-trash')) || []);
   const [settings, setSettings] = useState(() => {
@@ -43,7 +42,7 @@ function App() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [visibleCount, setVisibleCount] = useState(8);
-  
+
   const fetchVaultFiles = async () => {
     try {
       const response = await fetch(`${API_URL}/files`);
@@ -190,9 +189,9 @@ function App() {
   // Filter files based on current tab, search query, or active folder
   const displayFiles = files.filter(file => {
     const filename = file.displayName || file.name || '';
-    const cleanName = getCleanFileName(filename).toLowerCase();
+    const cleanName = filename.replace(/^\d+-/, '').toLowerCase();
     if (searchQuery && !cleanName.includes(searchQuery.toLowerCase())) {
-      return false; 
+      return false;
     }
 
     const isTrashed = file.isTrashed || trashedFiles.includes(file.name);
@@ -247,9 +246,9 @@ function App() {
             <div className="folders-header-bar">
               {selectedFolder ? (
                 <div className="breadcrumb-nav">
-                  <button 
-                    className="settings-icon-btn" 
-                    onClick={() => setSelectedFolder(null)} 
+                  <button
+                    className="settings-icon-btn"
+                    onClick={() => setSelectedFolder(null)}
                     title="Back to Folders"
                   >
                     <img src={backIcon} alt="Back" className="settings-svg" />

@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import { getCleanFileName } from '../utils/cleanName';
 
 // Import your custom SVGs for the file cards
 import photosIcon from '../assets/icons/pic.svg';
@@ -16,28 +15,28 @@ import fillHeartIcon from '../assets/icons/fill_heart.svg';
 import restoreIcon from '../assets/icons/restore.svg';
 import moveIcon from '../assets/icons/move.svg';
 
-export default function FileCard({ 
-  type = 'image', 
-  name = 'File.jpg', 
-  size = '0.0 MB', 
+export default function FileCard({
+  type = 'image',
+  name = 'File.jpg',
+  size = '0.0 MB',
   date = 'Aug 7',
   url,
   downloadUrl,
   onDelete,
   isFavorite,
-  isTrashed, 
+  isTrashed,
   onToggleFavorite,
   onRestore,
   onMove,
   settings = {}
 }) {
 
-  const displayName = getCleanFileName(name);
+  const displayName = name.replace(/^\d+-/, '');
   const videoRef = useRef(null);
 
   const handleMouseEnter = () => {
     if (settings?.hoverVideoPlayback && videoRef.current) {
-      videoRef.current.play().catch(() => {});
+      videoRef.current.play().catch(() => { });
     }
   };
 
@@ -69,21 +68,21 @@ export default function FileCard({
       window.open(url, '_blank');
     }
   };
-  
+
   const handleDownload = async (e) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
     try {
       const targetDownloadUrl = downloadUrl || url;
       const response = await fetch(targetDownloadUrl);
-      const blob = await response.blob(); 
-      const blobUrl = window.URL.createObjectURL(blob); 
-      
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
       const link = document.createElement('a');
       link.href = blobUrl;
       link.download = displayName;
       document.body.appendChild(link);
-      link.click(); 
-      
+      link.click();
+
       document.body.removeChild(link);
       window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
@@ -92,34 +91,34 @@ export default function FileCard({
   };
 
   return (
-    <div 
-      className="file-card-v2" 
+    <div
+      className="file-card-v2"
       onClick={handleCardClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <div className="file-preview">
-        
+
         <div className="media-background">
           {type === 'image' && url ? (
-            <img 
-              src={url} 
-              alt={displayName} 
+            <img
+              src={url}
+              alt={displayName}
               className={`preview-image ${settings.blurPreview ? 'blurred-media' : ''}`}
               onError={(e) => { e.target.style.display = 'none'; }}
             />
           ) : type === 'video' && url ? (
-            <video 
+            <video
               ref={videoRef}
-              src={url} 
-              muted 
-              loop 
-              playsInline 
+              src={url}
+              muted
+              loop
+              playsInline
               className={`preview-video ${settings.blurPreview ? 'blurred-media' : ''}`}
               onError={(e) => { e.target.style.display = 'none'; }}
             />
           ) : null}
-          
+
           <div className="fallback-icon">
             <img src={iconSrc} alt="file type icon" className="card-custom-svg" />
           </div>
@@ -138,10 +137,10 @@ export default function FileCard({
             <>
               {/* Favorite Button with Custom SVG */}
               <button className="action-btn" title={isFavorite ? "Remove from Favorites" : "Add to Favorites"} onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}>
-                <img 
-                  src={isFavorite ? fillHeartIcon : emptyHeartIcon} 
-                  alt="Favorite" 
-                  className="action-svg-icon" 
+                <img
+                  src={isFavorite ? fillHeartIcon : emptyHeartIcon}
+                  alt="Favorite"
+                  className="action-svg-icon"
                 />
               </button>
 
@@ -158,7 +157,7 @@ export default function FileCard({
               )}
             </>
           )}
-          
+
           {/* Delete / Trash Button with Custom SVG */}
           <button className="action-btn delete-btn" title={isTrashed ? "Permanently Delete File" : "Move to Trash"} onClick={(e) => {
             e.stopPropagation();
@@ -168,7 +167,7 @@ export default function FileCard({
           </button>
         </div>
       </div>
-      
+
       <div className="file-info">
         <h4 className="file-name">{displayName}</h4>
         <p className="file-meta">{size} • {date}</p>
