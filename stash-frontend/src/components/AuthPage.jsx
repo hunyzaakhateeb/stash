@@ -19,6 +19,24 @@ export default function AuthPage({ onAuthSuccess }) {
   const [successMsg, setSuccessMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Theme toggle state (Sun ☀️ / Moon 🌙 icons)
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem('stash-settings');
+    const parsed = saved ? JSON.parse(saved) : {};
+    const initialTheme = parsed.theme || 'dark';
+    document.documentElement.setAttribute('data-theme', initialTheme);
+    return initialTheme;
+  });
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+    const saved = localStorage.getItem('stash-settings');
+    const parsed = saved ? JSON.parse(saved) : {};
+    localStorage.setItem('stash-settings', JSON.stringify({ ...parsed, theme: newTheme }));
+  };
+
   // Handle Form Submission (Sign In or Send OTP)
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -143,6 +161,16 @@ export default function AuthPage({ onAuthSuccess }) {
   return (
     <div className="auth-page-container">
       <div className="auth-card">
+        {/* Top Right Corner Theme Toggle Button (Sun ☀️ / Moon 🌙 Icons) */}
+        <button 
+          type="button"
+          className="auth-theme-toggle-btn"
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+        >
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
+
         {/* Header / Logo */}
         <div className="auth-header">
           <img src={logo} alt="Stash Vault" className="auth-logo" />

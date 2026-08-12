@@ -1029,6 +1029,7 @@ body {
 }
 
 .auth-card {
+  position: relative;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: 20px;
@@ -1037,6 +1038,30 @@ body {
   padding: 36px 32px;
   box-shadow: 0 20px 40px var(--shadow-color);
   animation: fadeIn 0.3s ease-out;
+}
+
+.auth-theme-toggle-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  z-index: 10;
+}
+
+.auth-theme-toggle-btn:hover {
+  transform: scale(1.08);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 12px rgba(25, 167, 255, 0.3);
 }
 
 .auth-header {
