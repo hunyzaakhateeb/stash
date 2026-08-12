@@ -14,7 +14,7 @@ import searchIcon from '../assets/search-icon.svg';
 import settingsIcon from '../assets/icons/settings.svg';
 import plusIcon from '../assets/icons/plus.svg';
 
-export default function Navbar({ onAddClick, onCreateFolderClick, onOpenSettings, activeTab, setActiveTab, searchQuery, setSearchQuery }) {
+export default function Navbar({ onAddClick, onCreateFolderClick, onOpenSettings, activeTab, setActiveTab, searchQuery, setSearchQuery, user, onLogout }) {
 
   const tabIcons = {
     'All': allIcon,
@@ -62,6 +62,11 @@ export default function Navbar({ onAddClick, onCreateFolderClick, onOpenSettings
             <img src={plusIcon} alt="Add" className="add-svg-icon" />
             Add
           </button>
+          {onLogout && (
+            <button className="settings-icon-btn" onClick={onLogout} title={user ? `Sign Out (${user.username || user.email})` : "Sign Out"}>
+              <span style={{ fontSize: '1rem' }}>🚪</span>
+            </button>
+          )}
         </div>
       </div>
 

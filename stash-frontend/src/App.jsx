@@ -6,6 +6,7 @@ import UploadModal from './components/UploadModal';
 import SettingsModal from './components/SettingsModal';
 import CreateFolderModal from './components/CreateFolderModal';
 import MoveFileModal from './components/MoveFileModal';
+import AuthPage from './components/AuthPage';
 import plusIcon from './assets/icons/plus.svg';
 import folderIcon from './assets/icons/folder.svg';
 import backIcon from './assets/icons/back.svg';
@@ -13,6 +14,12 @@ import backIcon from './assets/icons/back.svg';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 function App() {
+  const [token, setToken] = useState(() => localStorage.getItem('stash-token') || null);
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = localStorage.getItem('stash-user');
+    return saved ? JSON.parse(saved) : null;
+  });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
@@ -43,9 +50,24 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [visibleCount, setVisibleCount] = useState(8);
 
+  const handleAuthSuccess = (newToken, user) => {
+    setToken(newToken);
+    setCurrentUser(user);
+    localStorage.setItem('stash-token', newToken);
+    localStorage.setItem('stash-user', JSON.stringify(user));
+  };
+
+  const handleLogout = () => {
+    setToken(null);
+    setCurrentUser(null);
+    localStorage.removeItem('stash-token');
+    localStorage.removeItem('stash-user');
+  };
+
   const fetchVaultFiles = async () => {
     try {
-      const response = await fetch(`${API_URL}/files`);
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const response = await fetch(`${API_URL}/files`, { headers });
       const data = await response.json();
       setFiles(data);
     } catch (error) {
@@ -55,7 +77,8 @@ function App() {
 
   const fetchFolders = async () => {
     try {
-      const response = await fetch(`${API_URL}/folders`);
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const response = await fetch(`${API_URL}/folders`, { headers });
       const data = await response.json();
       setFolders(data);
     } catch (error) {
@@ -64,9 +87,11 @@ function App() {
   };
 
   useEffect(() => {
-    fetchVaultFiles();
-    fetchFolders();
-  }, []);
+    if (token) {
+      fetchVaultFiles();
+      fetchFolders();
+    }
+  }, [token]);
 
   useEffect(() => {
     localStorage.setItem('stash-favorites', JSON.stringify(favorites));
@@ -226,6 +251,10 @@ function App() {
 
   const filesToRender = displayFiles.slice(0, visibleCount);
 
+  if (!token) {
+    return <AuthPage onAuthSuccess={handleAuthSuccess} />;
+  }
+
   return (
     <div className="stash-app">
       <Navbar
@@ -236,6 +265,8 @@ function App() {
         setActiveTab={handleTabChange}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        user={currentUser}
+        onLogout={handleLogout}
       />
 
       <main className="dashboard-content">

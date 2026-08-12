@@ -4,11 +4,15 @@ const cors = require('cors');
 const multer = require('multer');
 const mongoose = require('mongoose');
 const { Readable } = require('stream');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const File = require('./models/File');
 const Folder = require('./models/Folder');
+const User = require('./models/User');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
+const JWT_SECRET = process.env.JWT_SECRET || 'stash_secret_key_jwt_2026';
 
 app.use(cors({ origin: '*' }));
 app.use(express.json());
@@ -58,7 +62,126 @@ function formatBytes(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-// --- ROUTES ---
+// --- AUTH ROUTES ---
+
+// 1. User Registration
+app.post('/auth/register', async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: 'Please provide all required fields' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const existingUser = await User.findOne({ email: cleanEmail });
+    if (existingUser) {
+      return res.status(400).json({ error: 'An account with this email already exists' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newUser = await User.create({
+      username: username.trim(),
+      email: cleanEmail,
+      password: hashedPassword
+    });
+
+    const token = jwt.sign(
+      { userId: newUser._id, email: newUser.email, username: newUser.username },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.status(201).json({
+      token,
+      user: {
+        id: newUser._id,
+        username: newUser.username,
+        email: newUser.email
+      }
+    });
+  } catch (error) {
+    console.error('Register error:', error);
+    res.status(500).json({ error: 'Failed to create user account' });
+  }
+});
+
+// 2. User Login
+app.post('/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Please enter email and password' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: cleanEmail });
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid email or password' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Invalid email or password' });
+    }
+
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, username: user.username },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email
+      }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Authentication failed' });
+  }
+});
+
+// 3. Verify Active Session
+app.get('/auth/me', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.userId).select('-password');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ user: { id: user._id, username: user.username, email: user.email } });
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid or expired token' });
+  }
+});
+
+// Optional Auth Middleware for extracting user identity from Bearer token
+app.use((req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    try {
+      const token = authHeader.split(' ')[1];
+      const decoded = jwt.verify(token, JWT_SECRET);
+      req.user = decoded;
+      req.userId = decoded.userId;
+    } catch (e) {
+      // Ignored if invalid token
+    }
+  }
+  next();
+});
+
+// --- FILE & VAULT ROUTES ---
 
 // Health Check
 app.get('/', (req, res) => {
@@ -106,7 +229,8 @@ app.post('/upload', upload.any(), async (req, res) => {
               mimeType: mimeType,
               isFavorite: false,
               isTrashed: false,
-              folderId: targetFolderId ? new mongoose.Types.ObjectId(targetFolderId) : null
+              folderId: targetFolderId ? new mongoose.Types.ObjectId(targetFolderId) : null,
+              userId: req.userId || null
             });
 
             await newFile.save();
@@ -141,7 +265,8 @@ app.post('/upload', upload.any(), async (req, res) => {
 // 2. FETCH ALL FILES FROM MONGODB
 app.get('/files', async (req, res) => {
   try {
-    const files = await File.find().sort({ createdAt: -1 });
+    const fileFilter = req.userId ? { $or: [{ userId: req.userId }, { userId: null }] } : {};
+    const files = await File.find(fileFilter).sort({ createdAt: -1 });
     const host = req.get('host');
     const protocol = req.protocol;
 
@@ -303,7 +428,8 @@ app.post('/folders', async (req, res) => {
 
     const folder = new Folder({
       name: name.trim(),
-      color: color || '#00f2fe'
+      color: color || '#00f2fe',
+      userId: req.userId || null
     });
 
     await folder.save();
@@ -317,8 +443,9 @@ app.post('/folders', async (req, res) => {
 // 10. GET ALL FOLDERS WITH FILE STATS
 app.get('/folders', async (req, res) => {
   try {
-    const folders = await Folder.find().sort({ createdAt: -1 });
-    const allFiles = await File.find({ isTrashed: false });
+    const folderFilter = req.userId ? { $or: [{ userId: req.userId }, { userId: null }] } : {};
+    const folders = await Folder.find(folderFilter).sort({ createdAt: -1 });
+    const allFiles = await File.find({ isTrashed: false, ...folderFilter });
 
     const foldersWithStats = folders.map(folder => {
       const folderFiles = allFiles.filter(file => file.folderId && file.folderId.toString() === folder._id.toString());
