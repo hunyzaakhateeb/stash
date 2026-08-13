@@ -28,7 +28,10 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-app.use(cors({ origin: '*' }));
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://hk-stash.vercel.app'], // 👈 Add your Vercel URL
+  credentials: true
+}));
 app.use(express.json());
 
 // 1. Multer setup with memory storage
@@ -612,7 +615,7 @@ app.delete('/files/:id', async (req, res) => {
     if (!req.userId) return res.status(401).json({ error: 'Unauthorized' });
 
     const fileDoc = await File.findOne({ _id: req.params.id, userId: req.userId });
-    
+
     if (!fileDoc) {
       return res.status(404).json({ error: 'File not found in your workspace' });
     }
