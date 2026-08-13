@@ -7,6 +7,7 @@ const { Readable } = require('stream');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const { OAuth2Client } = require('google-auth-library');
 const File = require('./models/File');
 const Folder = require('./models/Folder');
@@ -18,6 +19,10 @@ const PORT = process.env.PORT || 5001;
 const JWT_SECRET = process.env.JWT_SECRET || 'stash_secret_key_jwt_2026';
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+// Resend client (for production/Railway — works over HTTPS, not blocked)
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
+// Nodemailer fallback (for local development with Gmail SMTP)
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: parseInt(process.env.SMTP_PORT || '587'),
@@ -27,6 +32,31 @@ const transporter = nodemailer.createTransport({
     pass: process.env.SMTP_PASS
   }
 });
+
+// Unified email sender — uses Resend in production, nodemailer locally
+async function sendEmail({ to, subject, html }) {
+  if (resend) {
+    // Resend API (works on Railway free tier)
+    const { error } = await resend.emails.send({
+      from: 'Stash Security <onboarding@resend.dev>',
+      to,
+      subject,
+      html
+    });
+    if (error) throw new Error(error.message);
+  } else if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+    // Nodemailer (local dev with Gmail)
+    await transporter.sendMail({
+      from: `"Stash Security" <${process.env.SMTP_USER}>`,
+      to,
+      subject,
+      html
+    });
+  } else {
+    // Terminal fallback
+    return null; // signal to print to console
+  }
+}
 
 // Sanitize duplicate leading slashes in incoming request URLs (e.g., //auth/login -> /auth/login)
 app.use((req, res, next) => {
@@ -122,29 +152,29 @@ app.post(['/auth/send-otp', '/signup', '/auth/signup'], async (req, res) => {
       otp: generatedOtp
     });
 
-    // Send email using Nodemailer
-    if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-      try {
-        await transporter.sendMail({
-          from: `"Stash Security" <${process.env.SMTP_USER}>`,
-          to: cleanEmail,
-          subject: '🔒 Your Stash Verification Code',
-          html: `
-            <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #0d1117; color: #ffffff; border-radius: 10px;">
-              <h2 style="color: #19a7ff;">Stash Email Verification</h2>
-              <p>Your 6-digit OTP security code is:</p>
-              <h1 style="font-size: 32px; letter-spacing: 6px; color: #19a7ff; background: #161b22; padding: 10px 20px; display: inline-block; border-radius: 8px;">${generatedOtp}</h1>
-              <p style="color: #8b949e; font-size: 12px; margin-top: 20px;">This code will expire automatically in 10 minutes. If you did not request this, please ignore this email.</p>
-            </div>
-          `
-        });
-      } catch (mailErr) {
-        console.warn('Nodemailer send warning:', mailErr.message);
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #0d1117; color: #ffffff; border-radius: 10px;">
+        <h2 style="color: #19a7ff;">Stash Email Verification</h2>
+        <p>Your 6-digit OTP security code is:</p>
+        <h1 style="font-size: 32px; letter-spacing: 6px; color: #19a7ff; background: #161b22; padding: 10px 20px; display: inline-block; border-radius: 8px;">${generatedOtp}</h1>
+        <p style="color: #8b949e; font-size: 12px; margin-top: 20px;">This code will expire automatically in 10 minutes. If you did not request this, please ignore this email.</p>
+      </div>
+    `;
+
+    try {
+      const result = await sendEmail({
+        to: cleanEmail,
+        subject: 'Your Stash Verification Code',
+        html: emailHtml
+      });
+      // null means no email provider configured — log to terminal
+      if (result === null) {
+        console.log(`\n========================================`);
+        console.log(`OTP SECURITY CODE FOR ${cleanEmail}: ${generatedOtp}`);
+        console.log(`========================================\n`);
       }
-    } else {
-      console.log(`\n========================================`);
-      console.log(`🔑 OTP SECURITY CODE FOR ${cleanEmail}: ${generatedOtp}`);
-      console.log(`========================================\n`);
+    } catch (mailErr) {
+      console.warn('Email send warning:', mailErr.message);
     }
 
     res.json({ message: 'OTP verification code sent to your email.', email: cleanEmail });
