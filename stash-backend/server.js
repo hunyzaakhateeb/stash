@@ -19,13 +19,24 @@ const PORT = process.env.PORT || 5001;
 const JWT_SECRET = process.env.JWT_SECRET || 'stash_secret_key_jwt_2026';
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-// Resend client (secondary fallback)
+// Resend client (fallback if configured)
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-// Unified email sender — uses HTTPS APIs only (Railway blocks all SMTP)
-// Priority: Brevo API → Resend API → terminal log
+// Gmail SMTP transporter — forced to IPv4 (Port 465 SSL)
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  family: 4,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  }
+});
+
+// Unified email sender — supports Brevo API, Gmail SMTP, Resend API, or terminal log fallback
 async function sendEmail({ to, subject, html }) {
-  // 1. Brevo (Sendinblue) — 300 emails/day free, HTTPS API, works on Railway
+  // 1. Brevo HTTPS API (Works 100% on Render/Vercel/Railway — no SMTP port block)
   if (process.env.BREVO_API_KEY) {
     const response = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
@@ -48,7 +59,18 @@ async function sendEmail({ to, subject, html }) {
     return;
   }
 
-  // 2. Resend fallback (free tier: only sends to owner email without domain)
+  // 2. Gmail SMTP (Works on Render and local dev)
+  if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+    await transporter.sendMail({
+      from: `"Stash Security" <${process.env.SMTP_USER}>`,
+      to,
+      subject,
+      html
+    });
+    return;
+  }
+
+  // 3. Resend HTTPS API (Fallback)
   if (resend) {
     const { error } = await resend.emails.send({
       from: 'Stash Security <onboarding@resend.dev>',
@@ -60,7 +82,7 @@ async function sendEmail({ to, subject, html }) {
     return;
   }
 
-  // 3. No provider configured — signal caller to print to terminal
+  // 4. No provider configured — signal to log OTP to console
   return null;
 }
 
@@ -158,34 +180,30 @@ app.post(['/auth/send-otp', '/signup', '/auth/signup'], async (req, res) => {
       otp: generatedOtp
     });
 
-    // ✅ Respond IMMEDIATELY — don't wait for email to send
-    // This prevents the button from hanging if SMTP times out
+    // ✅ Respond IMMEDIATELY — don't wait for email network transport to finish
     res.json({ message: 'OTP verification code sent to your email.', email: cleanEmail });
 
-    // Send email in background (fire and forget)
+    // Send email asynchronously in background
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #0d1117; color: #ffffff; border-radius: 10px;">
         <h2 style="color: #19a7ff;">Stash Email Verification</h2>
         <p>Your 6-digit OTP security code is:</p>
         <h1 style="font-size: 32px; letter-spacing: 6px; color: #19a7ff; background: #161b22; padding: 10px 20px; display: inline-block; border-radius: 8px;">${generatedOtp}</h1>
-        <p style="color: #8b949e; font-size: 12px; margin-top: 20px;">This code expires in 10 minutes. If you did not request this, please ignore this email.</p>
+        <p style="color: #8b949e; font-size: 12px; margin-top: 20px;">This code will expire automatically in 10 minutes. If you did not request this, please ignore this email.</p>
       </div>
     `;
 
     sendEmail({ to: cleanEmail, subject: 'Your Stash Verification Code', html: emailHtml })
       .then(result => {
         if (result === null) {
-          // No email provider configured — print OTP to Railway logs
           console.log(`\n========================================`);
-          console.log(`OTP FOR ${cleanEmail}: ${generatedOtp}`);
+          console.log(`🔑 OTP SECURITY CODE FOR ${cleanEmail}: ${generatedOtp}`);
           console.log(`========================================\n`);
         }
       })
       .catch(mailErr => {
-        // Email failed but OTP is already saved — log it so admin can see code
-        console.warn(`Email failed for ${cleanEmail} — OTP: ${generatedOtp} — Error: ${mailErr.message}`);
+        console.warn(`Email send warning for ${cleanEmail} (OTP: ${generatedOtp}):`, mailErr.message);
       });
-
   } catch (error) {
     console.error('Send OTP error:', error);
     res.status(500).json({ error: 'Failed to generate and send OTP code.' });
