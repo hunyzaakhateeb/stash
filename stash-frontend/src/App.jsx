@@ -371,8 +371,8 @@ function App() {
                   size={file.size}
                   date={file.createdAt ? new Date(file.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : (file.date || 'Today')}
                   type={file.type || 'other'}
-                  url={file.url || `${API_URL}/files/raw/${file._id}`}
-                  downloadUrl={file.downloadUrl || `${API_URL}/files/download/${file._id}`}
+                  url={(file.url || `${API_URL}/files/raw/${file._id}`).replace(/^http:\/\//i, 'https://')}
+                  downloadUrl={(file.downloadUrl || `${API_URL}/files/download/${file._id}`).replace(/^http:\/\//i, 'https://')}
                   isFavorite={file.isFavorite || favorites.includes(file.name)}
                   isTrashed={file.isTrashed || trashedFiles.includes(file.name)}
                   onToggleFavorite={() => toggleFavorite(file)}
