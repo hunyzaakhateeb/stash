@@ -19,33 +19,37 @@ const PORT = process.env.PORT || 5001;
 const JWT_SECRET = process.env.JWT_SECRET || 'stash_secret_key_jwt_2026';
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-// Resend client (fallback if SMTP not configured)
+// Resend client (secondary fallback)
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-// Gmail SMTP transporter — forced to IPv4 to avoid Railway IPv6 issues
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,        // SSL on port 465 (more reliable than STARTTLS on 587)
-  family: 4,           // Force IPv4 — fixes Railway "ENETUNREACH" on IPv6
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  }
-});
-
-// Unified email sender — prefers Gmail SMTP, falls back to Resend, then terminal
+// Unified email sender — uses HTTPS APIs only (Railway blocks all SMTP)
+// Priority: Brevo API → Resend API → terminal log
 async function sendEmail({ to, subject, html }) {
-  if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-    // Gmail SMTP with IPv4 forced (works on Railway)
-    await transporter.sendMail({
-      from: `"Stash Security" <${process.env.SMTP_USER}>`,
-      to,
-      subject,
-      html
+  // 1. Brevo (Sendinblue) — 300 emails/day free, HTTPS API, works on Railway
+  if (process.env.BREVO_API_KEY) {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': process.env.BREVO_API_KEY,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        sender: { name: 'Stash Security', email: process.env.SMTP_USER || 'hunyzaak@gmail.com' },
+        to: [{ email: to }],
+        subject,
+        htmlContent: html
+      })
     });
-  } else if (resend) {
-    // Resend API fallback (only works for owner's email on free tier)
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message || 'Brevo API error');
+    }
+    return;
+  }
+
+  // 2. Resend fallback (free tier: only sends to owner email without domain)
+  if (resend) {
     const { error } = await resend.emails.send({
       from: 'Stash Security <onboarding@resend.dev>',
       to,
@@ -53,10 +57,11 @@ async function sendEmail({ to, subject, html }) {
       html
     });
     if (error) throw new Error(error.message);
-  } else {
-    // No email provider — signal to print OTP to terminal
-    return null;
+    return;
   }
+
+  // 3. No provider configured — signal caller to print to terminal
+  return null;
 }
 
 // Sanitize duplicate leading slashes in incoming request URLs (e.g., //auth/login -> /auth/login)
