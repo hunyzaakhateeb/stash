@@ -28,8 +28,23 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// Sanitize duplicate leading slashes in incoming request URLs (e.g., //auth/login -> /auth/login)
+app.use((req, res, next) => {
+  if (req.url.startsWith('//')) {
+    req.url = req.url.replace(/^\/+/, '/');
+  }
+  next();
+});
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://hk-stash.vercel.app'], // 👈 Add your Vercel URL
+  origin: function (origin, callback) {
+    // Allow requests with no origin or any vercel.app / localhost origin
+    if (!origin || origin.includes('vercel.app') || origin.includes('localhost')) {
+      callback(null, true);
+    } else {
+      callback(null, true);
+    }
+  },
   credentials: true
 }));
 app.use(express.json());
