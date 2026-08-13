@@ -153,32 +153,34 @@ app.post(['/auth/send-otp', '/signup', '/auth/signup'], async (req, res) => {
       otp: generatedOtp
     });
 
+    // ✅ Respond IMMEDIATELY — don't wait for email to send
+    // This prevents the button from hanging if SMTP times out
+    res.json({ message: 'OTP verification code sent to your email.', email: cleanEmail });
+
+    // Send email in background (fire and forget)
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #0d1117; color: #ffffff; border-radius: 10px;">
         <h2 style="color: #19a7ff;">Stash Email Verification</h2>
         <p>Your 6-digit OTP security code is:</p>
         <h1 style="font-size: 32px; letter-spacing: 6px; color: #19a7ff; background: #161b22; padding: 10px 20px; display: inline-block; border-radius: 8px;">${generatedOtp}</h1>
-        <p style="color: #8b949e; font-size: 12px; margin-top: 20px;">This code will expire automatically in 10 minutes. If you did not request this, please ignore this email.</p>
+        <p style="color: #8b949e; font-size: 12px; margin-top: 20px;">This code expires in 10 minutes. If you did not request this, please ignore this email.</p>
       </div>
     `;
 
-    try {
-      const result = await sendEmail({
-        to: cleanEmail,
-        subject: 'Your Stash Verification Code',
-        html: emailHtml
+    sendEmail({ to: cleanEmail, subject: 'Your Stash Verification Code', html: emailHtml })
+      .then(result => {
+        if (result === null) {
+          // No email provider configured — print OTP to Railway logs
+          console.log(`\n========================================`);
+          console.log(`OTP FOR ${cleanEmail}: ${generatedOtp}`);
+          console.log(`========================================\n`);
+        }
+      })
+      .catch(mailErr => {
+        // Email failed but OTP is already saved — log it so admin can see code
+        console.warn(`Email failed for ${cleanEmail} — OTP: ${generatedOtp} — Error: ${mailErr.message}`);
       });
-      // null means no email provider configured — log to terminal
-      if (result === null) {
-        console.log(`\n========================================`);
-        console.log(`OTP SECURITY CODE FOR ${cleanEmail}: ${generatedOtp}`);
-        console.log(`========================================\n`);
-      }
-    } catch (mailErr) {
-      console.warn('Email send warning:', mailErr.message);
-    }
 
-    res.json({ message: 'OTP verification code sent to your email.', email: cleanEmail });
   } catch (error) {
     console.error('Send OTP error:', error);
     res.status(500).json({ error: 'Failed to generate and send OTP code.' });
