@@ -19,24 +19,33 @@ const PORT = process.env.PORT || 5001;
 const JWT_SECRET = process.env.JWT_SECRET || 'stash_secret_key_jwt_2026';
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-// Resend client (for production/Railway — works over HTTPS, not blocked)
+// Resend client (fallback if SMTP not configured)
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-// Nodemailer fallback (for local development with Gmail SMTP)
+// Gmail SMTP transporter — forced to IPv4 to avoid Railway IPv6 issues
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: process.env.SMTP_SECURE === 'true',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,        // SSL on port 465 (more reliable than STARTTLS on 587)
+  family: 4,           // Force IPv4 — fixes Railway "ENETUNREACH" on IPv6
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
   }
 });
 
-// Unified email sender — uses Resend in production, nodemailer locally
+// Unified email sender — prefers Gmail SMTP, falls back to Resend, then terminal
 async function sendEmail({ to, subject, html }) {
-  if (resend) {
-    // Resend API (works on Railway free tier)
+  if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+    // Gmail SMTP with IPv4 forced (works on Railway)
+    await transporter.sendMail({
+      from: `"Stash Security" <${process.env.SMTP_USER}>`,
+      to,
+      subject,
+      html
+    });
+  } else if (resend) {
+    // Resend API fallback (only works for owner's email on free tier)
     const { error } = await resend.emails.send({
       from: 'Stash Security <onboarding@resend.dev>',
       to,
@@ -44,17 +53,9 @@ async function sendEmail({ to, subject, html }) {
       html
     });
     if (error) throw new Error(error.message);
-  } else if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-    // Nodemailer (local dev with Gmail)
-    await transporter.sendMail({
-      from: `"Stash Security" <${process.env.SMTP_USER}>`,
-      to,
-      subject,
-      html
-    });
   } else {
-    // Terminal fallback
-    return null; // signal to print to console
+    // No email provider — signal to print OTP to terminal
+    return null;
   }
 }
 
