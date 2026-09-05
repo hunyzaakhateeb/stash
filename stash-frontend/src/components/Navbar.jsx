@@ -1,6 +1,7 @@
 import React from 'react';
 import './../index.css';
 
+import SearchBarBot from './SearchBarBot';
 import allIcon from '../assets/icons/all.svg';
 import photosIcon from '../assets/icons/pic.svg';
 import videosIcon from '../assets/icons/vid.svg';
@@ -10,12 +11,27 @@ import favIcon from '../assets/icons/fill_heart.svg';
 import trashIcon from '../assets/icons/trash.svg';
 import folderIcon from '../assets/icons/folder.svg';
 import logo from '../assets/logo.svg';
-import searchIcon from '../assets/search-icon.svg';
 import settingsIcon from '../assets/icons/settings.svg';
 import plusIcon from '../assets/icons/plus.svg';
 import logoutIcon from '../assets/icons/logout.svg';
 
-export default function Navbar({ onAddClick, onCreateFolderClick, onOpenSettings, activeTab, setActiveTab, searchQuery, setSearchQuery, user, onLogout }) {
+export default function Navbar({
+  onAddClick,
+  onCreateFolderClick,
+  onOpenSettings,
+  activeTab,
+  setActiveTab,
+  searchQuery,
+  setSearchQuery,
+  user,
+  onLogout,
+  files,
+  folders,
+  favorites,
+  trashedFiles,
+  setSelectedFolder,
+  token
+}) {
 
   const tabIcons = {
     'All': allIcon,
@@ -39,16 +55,18 @@ export default function Navbar({ onAddClick, onCreateFolderClick, onOpenSettings
         </div>
 
         <div className="search-section">
-          <div className="search-container">
-            <img src={searchIcon} alt="Search" className="search-svg" />
-            <input
-              type="text"
-              placeholder="Find something..."
-              className="search-input"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+          <SearchBarBot
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            files={files}
+            folders={folders}
+            favorites={favorites}
+            trashedFiles={trashedFiles}
+            setSelectedFolder={setSelectedFolder}
+            token={token}
+          />
         </div>
 
         <div className="actions-section" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>

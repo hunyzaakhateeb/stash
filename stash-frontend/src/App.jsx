@@ -72,10 +72,15 @@ function App() {
     try {
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       const response = await fetch(`${API_URL}/files`, { headers });
+      if (response.status === 401) {
+        handleLogout();
+        return;
+      }
       const data = await response.json();
-      setFiles(data);
+      setFiles(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Failed to fetch files:", error);
+      setFiles([]);
     }
   };
 
@@ -83,10 +88,15 @@ function App() {
     try {
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       const response = await fetch(`${API_URL}/folders`, { headers });
+      if (response.status === 401) {
+        handleLogout();
+        return;
+      }
       const data = await response.json();
-      setFolders(data);
+      setFolders(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Failed to fetch folders:", error);
+      setFolders([]);
     }
   };
 
@@ -229,14 +239,19 @@ function App() {
   };
 
   // Filter files based on current tab, search query, or active folder
-  const displayFiles = files.filter(file => {
+  const safeFiles = Array.isArray(files) ? files : [];
+  const safeFolders = Array.isArray(folders) ? folders : [];
+  const safeFavorites = Array.isArray(favorites) ? favorites : [];
+  const safeTrashedFiles = Array.isArray(trashedFiles) ? trashedFiles : [];
+
+  const displayFiles = safeFiles.filter(file => {
     const filename = file.displayName || file.name || '';
     const cleanName = filename.replace(/^\d+-/, '').toLowerCase();
     if (searchQuery && !cleanName.includes(searchQuery.toLowerCase())) {
       return false;
     }
 
-    const isTrashed = file.isTrashed || trashedFiles.includes(file.name);
+    const isTrashed = file.isTrashed || safeTrashedFiles.includes(file.name);
 
     if (activeTab === 'Trash') return isTrashed;
     if (isTrashed) return false;
@@ -246,7 +261,7 @@ function App() {
       return file.folderId && file.folderId.toString() === selectedFolder._id.toString();
     }
 
-    if (activeTab === 'Favorites') return file.isFavorite || favorites.includes(file.name);
+    if (activeTab === 'Favorites') return file.isFavorite || safeFavorites.includes(file.name);
     if (activeTab === 'All') return true;
 
     const fileType = file.type || '';
@@ -259,7 +274,7 @@ function App() {
     return false;
   });
 
-  const displayFolders = folders.filter(folder => {
+  const displayFolders = safeFolders.filter(folder => {
     if (searchQuery) {
       return folder.name.toLowerCase().includes(searchQuery.toLowerCase());
     }

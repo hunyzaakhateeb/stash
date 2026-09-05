@@ -13,6 +13,7 @@ const File = require('./models/File');
 const Folder = require('./models/Folder');
 const User = require('./models/User');
 const Otp = require('./models/Otp');
+const aiPipelineService = require('./services/aiPipelineService');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -516,6 +517,11 @@ app.post('/upload', upload.any(), async (req, res) => {
 
             await newFile.save();
 
+            // Asynchronously generate & store multimodal embedding
+            aiPipelineService.indexFile(newFile, file.buffer).catch(err => {
+              console.warn('Background indexing warning:', err.message);
+            });
+
             const fileUrl = `${protocol}://${host}/files/raw/${newFile._id}`;
             const downloadUrl = `${protocol}://${host}/files/download/${newFile._id}`;
 
@@ -781,6 +787,60 @@ app.delete('/folders/:id', async (req, res) => {
   } catch (error) {
     console.error('Error deleting folder:', error);
     res.status(500).json({ error: 'Failed to delete folder' });
+  }
+});
+
+// --- MULTIMODAL AI SEARCH & CHATBOT API ROUTES ---
+
+// 12. Multimodal Hybrid Conversational Search
+app.post('/api/ai/search', async (req, res) => {
+  try {
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Unauthorized: Please sign in to search your vault.' });
+    }
+
+    const { query, contextHistory } = req.body;
+    const searchResult = await aiPipelineService.hybridSearch({
+      userId: req.userId,
+      queryText: query || '',
+      contextHistory: contextHistory || []
+    });
+
+    const host = req.get('host');
+    const protocol = req.protocol;
+
+    const filesWithUrls = searchResult.matchedFiles.map(file => {
+      const fileObj = file.toObject ? file.toObject() : file;
+      return {
+        ...fileObj,
+        url: `${protocol}://${host}/files/raw/${file._id}`,
+        downloadUrl: `${protocol}://${host}/files/download/${file._id}`
+      };
+    });
+
+    res.json({
+      summary: searchResult.summary,
+      count: searchResult.count,
+      files: filesWithUrls
+    });
+  } catch (error) {
+    console.error('AI Search route error:', error);
+    res.status(500).json({ error: 'Multimodal search failed', summary: 'Search encounter an issue. Showing default files.' });
+  }
+});
+
+// 13. Index Pre-existing Files for User Vault
+app.post('/api/ai/index-existing', async (req, res) => {
+  try {
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const indexedCount = await aiPipelineService.indexExistingFilesForUser(req.userId, gridfsBucket);
+    res.json({ message: `Successfully indexed ${indexedCount} existing files in your vault.`, indexedCount });
+  } catch (error) {
+    console.error('Index existing files error:', error);
+    res.status(500).json({ error: 'Failed to index existing files' });
   }
 });
 
