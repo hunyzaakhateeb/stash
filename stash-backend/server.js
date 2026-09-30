@@ -844,6 +844,6 @@ app.post('/api/ai/index-existing', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Vault Manager is listening securely on http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Vault Manager is listening on port ${PORT}`);
 });
