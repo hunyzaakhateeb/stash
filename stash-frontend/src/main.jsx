@@ -10,7 +10,7 @@ const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '1046908226027
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
         <App />
       </GoogleOAuthProvider>
     </BrowserRouter>

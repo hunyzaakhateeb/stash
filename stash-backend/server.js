@@ -95,17 +95,16 @@ app.use((req, res, next) => {
   next();
 });
 
+
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin or any vercel.app / localhost origin
-    if (!origin || origin.includes('vercel.app') || origin.includes('localhost')) {
-      callback(null, true);
-    } else {
-      callback(null, true);
-    }
-  },
+  origin: [
+    'https://hk-stash.vercel.app',
+    'https://stash-frontend-y7vv.onrender.com',
+    'http://localhost:5173'
+  ],
   credentials: true
 }));
+
 app.use(express.json());
 
 // 1. Multer setup with memory storage
